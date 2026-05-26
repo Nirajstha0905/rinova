@@ -8,7 +8,7 @@ const DEMO_USERS = [
     role: 'Super Admin',
     badge: 'Platform',
     scope: 'All branches',
-    permissions: ['Dashboard', 'Consultancies', 'Analytics', 'Team', 'Reports', 'Settings'],
+    permissions: ['Dashboard', 'Leads', 'Students', 'Documents', 'Applications', 'Tasks', 'Student Portal'],
   },
   {
     email: 'admin@rinovacreation.com',
@@ -16,7 +16,7 @@ const DEMO_USERS = [
     role: 'Consultancy Admin',
     badge: 'Admin',
     scope: 'Rinova Creation Main Office',
-    permissions: ['Dashboard', 'Students', 'Applications', 'Documents', 'Workflows', 'Team', 'Reports'],
+    permissions: ['Dashboard', 'Leads', 'Students', 'Documents', 'Applications', 'Tasks', 'Student Portal'],
   },
   {
     email: 'counsellor@rinovacreation.com',
@@ -24,7 +24,7 @@ const DEMO_USERS = [
     role: 'Counsellor',
     badge: 'Counsellor',
     scope: 'Study Abroad Desk',
-    permissions: ['Dashboard', 'Students', 'Applications', 'Workflows', 'Communications'],
+    permissions: ['Dashboard', 'Leads', 'Students', 'Applications', 'Tasks'],
   },
   {
     email: 'documents@rinovacreation.com',
@@ -32,7 +32,7 @@ const DEMO_USERS = [
     role: 'Documentation Officer',
     badge: 'Docs',
     scope: 'Document Verification',
-    permissions: ['Dashboard', 'Documents', 'Applications', 'Communications'],
+    permissions: ['Dashboard', 'Documents', 'Applications', 'Tasks'],
   },
   {
     email: 'student@rinovacreation.com',
@@ -40,7 +40,7 @@ const DEMO_USERS = [
     role: 'Student',
     badge: 'Student',
     scope: 'Personal application portal',
-    permissions: ['Dashboard', 'Applications', 'Documents', 'Messages'],
+    permissions: ['Dashboard', 'Student Portal', 'Documents', 'Applications', 'Tasks'],
   },
 ];
 
@@ -50,70 +50,142 @@ const DEFAULT_FORM = {
   remember: true,
 };
 
-const roleDashboards = {
-  'Super Admin': {
-    headline: 'Platform command center',
-    description: 'Monitor consultancy performance, revenue, system health, and cross-branch activity.',
-    stats: [
-      { label: 'Consultancies', value: '12', detail: '+2 onboarding' },
-      { label: 'Total students', value: '4,820', detail: '18% growth' },
-      { label: 'Monthly revenue', value: 'Rs.184K', detail: '+11.4%' },
-      { label: 'System health', value: '99.9%', detail: 'All services stable' },
-    ],
-    tasks: ['Review branch performance reports', 'Approve new consultancy workspace', 'Audit role permissions'],
-  },
-  'Consultancy Admin': {
-    headline: 'Rinova operations overview',
-    description: 'Manage counsellors, student pipelines, partner schools, applications, and reporting.',
-    stats: [
-      { label: 'Active leads', value: '248', detail: '+18 this week' },
-      { label: 'Applications', value: '72', detail: '14 awaiting docs' },
-      { label: 'Team tasks', value: '31', detail: '9 overdue' },
-      { label: 'Partner schools', value: '36', detail: '8 priority partners' },
-    ],
-    tasks: ['Assign new inquiry leads', 'Review counsellor workload', 'Prepare weekly enrollment report'],
-  },
-  Counsellor: {
-    headline: 'Counselling pipeline',
-    description: 'Track student conversations, applications, follow-ups, and enrollment readiness.',
-    stats: [
-      { label: 'My students', value: '86', detail: '12 high intent' },
-      { label: 'Follow-ups today', value: '14', detail: '6 visa calls' },
-      { label: 'Offers received', value: '21', detail: '5 this week' },
-      { label: 'Unread messages', value: '9', detail: 'Reply needed' },
-    ],
-    tasks: ['Call students waiting on university shortlist', 'Update Canada intake notes', 'Send SOP reminder'],
-  },
-  'Documentation Officer': {
-    headline: 'Document verification hub',
-    description: 'Validate transcripts, passports, finance proof, SOPs, and submission-ready files.',
-    stats: [
-      { label: 'Pending checks', value: '43', detail: '12 urgent' },
-      { label: 'Verified today', value: '18', detail: '+7 vs yesterday' },
-      { label: 'Missing files', value: '26', detail: 'Notify students' },
-      { label: 'Ready to submit', value: '15', detail: 'Final review' },
-    ],
-    tasks: ['Verify finance proof uploads', 'Flag incomplete passport scans', 'Prepare document checklist'],
-  },
-  Student: {
-    headline: 'Your application tracker',
-    description: 'Follow your documents, tasks, university choices, messages, and application status.',
-    stats: [
-      { label: 'Applications', value: '4', detail: '2 submitted' },
-      { label: 'Documents', value: '8/10', detail: '2 missing' },
-      { label: 'Tasks due', value: '3', detail: 'This week' },
-      { label: 'Messages', value: '5', detail: '2 unread' },
-    ],
-    tasks: ['Upload bank statement', 'Review offer letter', 'Confirm visa appointment date'],
-  },
-};
-
 const features = [
-  'Comprehensive student management and tracking',
-  'Application workflow automation',
-  'Document verification and management',
-  'Team collaboration and communication tools',
-  'Role-based access control and permissions',
+  'Authentication and role-based login',
+  'Dashboard analytics for applications, documents, visas, and workload',
+  'Lead management with counsellor assignment and conversion',
+  'Student profiles, document verification, and application tracking',
+  'Task management, follow-ups, and student portal access',
+];
+
+const initialLeads = [
+  {
+    id: 1,
+    name: 'Rohan Basnet',
+    country: 'Canada',
+    course: 'Business Analytics',
+    source: 'Facebook campaign',
+    counsellor: 'Maya Thapa',
+    status: 'Counselling',
+    nextFollowUp: 'Today, 2:00 PM',
+  },
+  {
+    id: 2,
+    name: 'Anita Gurung',
+    country: 'Australia',
+    course: 'Nursing',
+    source: 'Walk-in',
+    counsellor: 'Aarav Sharma',
+    status: 'New enquiry',
+    nextFollowUp: 'Tomorrow, 11:30 AM',
+  },
+  {
+    id: 3,
+    name: 'Samir KC',
+    country: 'United Kingdom',
+    course: 'Computer Science',
+    source: 'Referral',
+    counsellor: 'Maya Thapa',
+    status: 'Documents requested',
+    nextFollowUp: 'May 28, 10:00 AM',
+  },
+];
+
+const initialStudents = [
+  {
+    id: 101,
+    name: 'Emma Thompson',
+    passport: 'N1234567',
+    country: 'Canada',
+    course: 'MBA',
+    counsellor: 'Maya Thapa',
+    stage: 'Visa Preparation',
+    tags: ['High priority', 'Fall intake'],
+    academics: 'BBA, 3.4 GPA',
+    english: 'IELTS 7.0',
+    work: '2 years banking',
+  },
+  {
+    id: 102,
+    name: 'Aayush Shrestha',
+    passport: 'PA778899',
+    country: 'Australia',
+    course: 'IT',
+    counsellor: 'Aarav Sharma',
+    stage: 'Offer Received',
+    tags: ['Scholarship'],
+    academics: 'BSc CSIT, 72%',
+    english: 'PTE 68',
+    work: 'Internship',
+  },
+  {
+    id: 103,
+    name: 'Priya Lama',
+    passport: 'N5566123',
+    country: 'United Kingdom',
+    course: 'Public Health',
+    counsellor: 'Maya Thapa',
+    stage: 'Documents Pending',
+    tags: ['Needs SOP'],
+    academics: 'BPH, 3.6 GPA',
+    english: 'IELTS 6.5',
+    work: '1 year clinic assistant',
+  },
+];
+
+const initialDocuments = [
+  { id: 1, student: 'Emma Thompson', category: 'Passport', file: 'passport_emma.pdf', status: 'Approved', owner: 'Kabir Karki' },
+  { id: 2, student: 'Emma Thompson', category: 'Financial documents', file: 'bank_statement.pdf', status: 'Needs re-upload', owner: 'Kabir Karki' },
+  { id: 3, student: 'Aayush Shrestha', category: 'Offer letters', file: 'offer_deakin.pdf', status: 'Approved', owner: 'Kabir Karki' },
+  { id: 4, student: 'Priya Lama', category: 'SOP/GS statements', file: 'sop_draft.docx', status: 'Under review', owner: 'Kabir Karki' },
+];
+
+const initialApplications = [
+  {
+    id: 1,
+    student: 'Emma Thompson',
+    institution: 'University of Toronto',
+    country: 'Canada',
+    type: 'Institution',
+    stage: 'Visa Preparation',
+    progress: 70,
+  },
+  {
+    id: 2,
+    student: 'Aayush Shrestha',
+    institution: 'Deakin University',
+    country: 'Australia',
+    type: 'Institution',
+    stage: 'Offer Received',
+    progress: 55,
+  },
+  {
+    id: 3,
+    student: 'Priya Lama',
+    institution: 'University of Manchester',
+    country: 'United Kingdom',
+    type: 'Institution',
+    stage: 'Documents Pending',
+    progress: 30,
+  },
+];
+
+const initialTasks = [
+  { id: 1, title: 'Call Rohan for shortlist confirmation', owner: 'Maya Thapa', due: 'Today', status: 'Due today', priority: 'High' },
+  { id: 2, title: 'Review Emma bank statement re-upload', owner: 'Kabir Karki', due: 'Today', status: 'Due today', priority: 'High' },
+  { id: 3, title: 'Convert Anita lead after counselling', owner: 'Aarav Sharma', due: 'Tomorrow', status: 'Scheduled', priority: 'Medium' },
+  { id: 4, title: 'Update Priya SOP feedback', owner: 'Maya Thapa', due: 'Overdue', status: 'Overdue', priority: 'High' },
+];
+
+const pipelineStages = [
+  'Lead',
+  'Counselling',
+  'Documents Pending',
+  'Institution Applied',
+  'Offer Received',
+  'Visa Preparation',
+  'Visa Lodged',
+  'Visa Granted',
 ];
 
 const getSavedSession = () => {
@@ -133,20 +205,50 @@ function App() {
   const [showPassword, setShowPassword] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [isResetSent, setIsResetSent] = useState(false);
+  const [activeModule, setActiveModule] = useState('Dashboard');
+  const [leads, setLeads] = useState(initialLeads);
+  const [students, setStudents] = useState(initialStudents);
+  const [documents, setDocuments] = useState(initialDocuments);
+  const [applications] = useState(initialApplications);
+  const [tasks, setTasks] = useState(initialTasks);
+  const [leadDraft, setLeadDraft] = useState({
+    name: '',
+    country: 'Canada',
+    course: '',
+    source: 'Website',
+  });
+  const [taskDraft, setTaskDraft] = useState({
+    title: '',
+    owner: 'Maya Thapa',
+    due: 'Today',
+  });
 
   const isLocked = attempts >= 5;
-  const dashboard = session ? roleDashboards[session.role] : null;
 
-  const modules = useMemo(() => {
-    if (!session) {
-      return [];
-    }
+  const dashboardStats = useMemo(() => {
+    const pendingDocuments = documents.filter((document) => document.status !== 'Approved').length;
+    const dueToday = tasks.filter((task) => task.status === 'Due today' || task.status === 'Overdue').length;
 
-    return session.permissions.map((item) => ({
-      label: item,
-      active: item === 'Dashboard',
+    return [
+      { label: 'Total students', value: students.length, detail: 'Active student profiles' },
+      { label: 'Active applications', value: applications.length, detail: 'Institution and visa files' },
+      { label: 'Pending documents', value: pendingDocuments, detail: 'Need staff action' },
+      { label: 'Follow-ups due', value: dueToday, detail: 'Today and overdue' },
+      { label: 'Visa granted', value: 18, detail: '82% success rate' },
+      { label: 'Visa refused', value: 4, detail: 'Needs review notes' },
+    ];
+  }, [applications.length, documents, students.length, tasks]);
+
+  const staffWorkload = useMemo(() => {
+    const owners = ['Maya Thapa', 'Aarav Sharma', 'Kabir Karki'];
+    return owners.map((owner) => ({
+      owner,
+      tasks: tasks.filter((task) => task.owner === owner).length,
+      leads: leads.filter((lead) => lead.counsellor === owner).length,
     }));
-  }, [session]);
+  }, [leads, tasks]);
+
+  const modules = session?.permissions || [];
 
   const updateField = (event) => {
     const { name, value, checked, type } = event.target;
@@ -194,6 +296,7 @@ function App() {
     }
 
     setSession(nextSession);
+    setActiveModule(user.role === 'Student' ? 'Student Portal' : 'Dashboard');
     setAttempts(0);
     setMessage('');
     setErrors({});
@@ -250,11 +353,98 @@ function App() {
   const handleLogout = () => {
     window.localStorage.removeItem('rinova-session');
     setSession(null);
+    setActiveModule('Dashboard');
     setForm(DEFAULT_FORM);
     setMessage('You have been securely signed out.');
   };
 
-  if (session && dashboard) {
+  const addLead = (event) => {
+    event.preventDefault();
+
+    if (!leadDraft.name.trim() || !leadDraft.course.trim()) {
+      return;
+    }
+
+    setLeads((current) => [
+      {
+        id: Date.now(),
+        ...leadDraft,
+        counsellor: session.name,
+        status: 'New enquiry',
+        nextFollowUp: 'Tomorrow, 10:00 AM',
+      },
+      ...current,
+    ]);
+    setLeadDraft({ name: '', country: 'Canada', course: '', source: 'Website' });
+  };
+
+  const convertLead = (lead) => {
+    setStudents((current) => [
+      {
+        id: Date.now(),
+        name: lead.name,
+        passport: 'Pending',
+        country: lead.country,
+        course: lead.course,
+        counsellor: lead.counsellor,
+        stage: 'Counselling',
+        tags: ['Converted lead'],
+        academics: 'To be collected',
+        english: 'To be collected',
+        work: 'To be collected',
+      },
+      ...current,
+    ]);
+    setLeads((current) => current.filter((item) => item.id !== lead.id));
+    setActiveModule('Students');
+  };
+
+  const updateDocumentStatus = (id, status) => {
+    setDocuments((current) =>
+      current.map((document) => (document.id === id ? { ...document, status } : document))
+    );
+  };
+
+  const simulateUpload = () => {
+    setDocuments((current) => [
+      {
+        id: Date.now(),
+        student: session.role === 'Student' ? session.name : 'Emma Thompson',
+        category: 'Visa documents',
+        file: 'new_upload.pdf',
+        status: 'Under review',
+        owner: 'Kabir Karki',
+      },
+      ...current,
+    ]);
+  };
+
+  const addTask = (event) => {
+    event.preventDefault();
+
+    if (!taskDraft.title.trim()) {
+      return;
+    }
+
+    setTasks((current) => [
+      {
+        id: Date.now(),
+        ...taskDraft,
+        status: taskDraft.due === 'Today' ? 'Due today' : 'Scheduled',
+        priority: 'Medium',
+      },
+      ...current,
+    ]);
+    setTaskDraft({ title: '', owner: 'Maya Thapa', due: 'Today' });
+  };
+
+  const completeTask = (id) => {
+    setTasks((current) =>
+      current.map((task) => (task.id === id ? { ...task, status: 'Completed' } : task))
+    );
+  };
+
+  if (session) {
     return (
       <main className="crm-shell">
         <aside className="crm-sidebar" aria-label="Rinova Creation CRM navigation">
@@ -266,12 +456,17 @@ function App() {
             </div>
           </div>
 
-          <nav className="nav-list" aria-label="Role based navigation">
+          <nav className="nav-list" aria-label="Phase 1 navigation">
             {modules.map((item) => (
-              <a className={item.active ? 'active' : ''} href={`#${item.label.toLowerCase()}`} key={item.label}>
-                <span>{item.label.slice(0, 1)}</span>
-                {item.label}
-              </a>
+              <button
+                className={activeModule === item ? 'active' : ''}
+                key={item}
+                onClick={() => setActiveModule(item)}
+                type="button"
+              >
+                <span>{item.slice(0, 1)}</span>
+                {item}
+              </button>
             ))}
           </nav>
 
@@ -288,60 +483,66 @@ function App() {
           </button>
         </aside>
 
-        <section className="crm-content" id="dashboard">
+        <section className="crm-content">
           <header className="topbar">
             <div>
               <p className="eyebrow">{session.scope}</p>
-              <h2>{dashboard.headline}</h2>
-              <span>{dashboard.description}</span>
+              <h2>{activeModule}</h2>
+              <span>{getModuleDescription(activeModule, session.role)}</span>
             </div>
             <div className="role-badge">{session.badge}</div>
           </header>
 
-          <div className="stats-grid">
-            {dashboard.stats.map((item) => (
-              <article className="stat-card" key={item.label}>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-                <p>{item.detail}</p>
-              </article>
-            ))}
-          </div>
+          {activeModule === 'Dashboard' && (
+            <DashboardView
+              applications={applications}
+              dashboardStats={dashboardStats}
+              staffWorkload={staffWorkload}
+              tasks={tasks}
+            />
+          )}
 
-          <section className="dashboard-grid">
-            <article className="work-panel" aria-labelledby="workflow-heading">
-              <div className="panel-title">
-                <div>
-                  <p className="eyebrow">Priority workflow</p>
-                  <h3 id="workflow-heading">Next best actions</h3>
-                </div>
-                <span>Today</span>
-              </div>
-              <div className="task-list">
-                {dashboard.tasks.map((task, index) => (
-                  <div key={task}>
-                    <span className="task-index">{index + 1}</span>
-                    <strong>{task}</strong>
-                  </div>
-                ))}
-              </div>
-            </article>
+          {activeModule === 'Leads' && (
+            <LeadsView
+              leadDraft={leadDraft}
+              leads={leads}
+              onAddLead={addLead}
+              onConvertLead={convertLead}
+              setLeadDraft={setLeadDraft}
+            />
+          )}
 
-            <article className="work-panel permission-panel" aria-labelledby="permissions-heading">
-              <div className="panel-title">
-                <div>
-                  <p className="eyebrow">Access control</p>
-                  <h3 id="permissions-heading">Allowed modules</h3>
-                </div>
-                <span>{session.permissions.length} modules</span>
-              </div>
-              <div className="permission-list">
-                {session.permissions.map((permission) => (
-                  <span key={permission}>{permission}</span>
-                ))}
-              </div>
-            </article>
-          </section>
+          {activeModule === 'Students' && <StudentsView students={students} />}
+
+          {activeModule === 'Documents' && (
+            <DocumentsView
+              documents={documents}
+              onSimulateUpload={simulateUpload}
+              onUpdateStatus={updateDocumentStatus}
+              session={session}
+            />
+          )}
+
+          {activeModule === 'Applications' && <ApplicationsView applications={applications} />}
+
+          {activeModule === 'Tasks' && (
+            <TasksView
+              onAddTask={addTask}
+              onCompleteTask={completeTask}
+              setTaskDraft={setTaskDraft}
+              taskDraft={taskDraft}
+              tasks={tasks}
+            />
+          )}
+
+          {activeModule === 'Student Portal' && (
+            <StudentPortalView
+              applications={applications}
+              documents={documents}
+              onSimulateUpload={simulateUpload}
+              tasks={tasks}
+            />
+          )}
         </section>
       </main>
     );
@@ -354,16 +555,16 @@ function App() {
           <span className="brand-mark">R</span>
           <div>
             <h1>Rinova Creation</h1>
-            <p>Modern Education Consultancy and CRM Platform</p>
+            <p>Consultancy and Education Management System</p>
           </div>
         </div>
 
         <div className="feature-panel">
-          <h2>Key Features</h2>
+          <h2>Phase 1 MVP</h2>
           <ul>
             {features.map((feature) => (
               <li key={feature}>
-                <span aria-hidden="true">✓</span>
+                <span aria-hidden="true">OK</span>
                 {feature}
               </li>
             ))}
@@ -464,6 +665,397 @@ function App() {
         </div>
       </section>
     </main>
+  );
+}
+
+function getModuleDescription(moduleName, role) {
+  const descriptions = {
+    Dashboard: 'Operational overview for students, applications, documents, follow-ups, visa outcomes, and staff workload.',
+    Leads: 'Capture enquiries, assign counsellors, schedule follow-ups, and convert qualified leads into student profiles.',
+    Students: 'Maintain complete student records with passport, academic, English test, work, preference, and activity details.',
+    Documents: 'Upload, review, approve, reject, and request re-upload for all student document categories.',
+    Applications: 'Track institution and visa applications through customizable workflow stages.',
+    Tasks: 'Create follow-ups, assign responsibilities, monitor deadlines, and close completed work.',
+    'Student Portal': 'Student-facing portal for uploads, application status, pending requirements, and updates.',
+  };
+
+  if (role === 'Student' && moduleName === 'Dashboard') {
+    return 'Personal overview for your applications, documents, tasks, and messages.';
+  }
+
+  return descriptions[moduleName] || 'Phase 1 CRM module.';
+}
+
+function DashboardView({ applications, dashboardStats, staffWorkload, tasks }) {
+  return (
+    <>
+      <div className="stats-grid wide">
+        {dashboardStats.map((item) => (
+          <article className="stat-card" key={item.label}>
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+            <p>{item.detail}</p>
+          </article>
+        ))}
+      </div>
+
+      <section className="dashboard-grid">
+        <article className="work-panel">
+          <PanelTitle eyebrow="Monthly trends" title="Application pipeline" note="Last 6 months" />
+          <div className="trend-bars">
+            {[32, 46, 38, 58, 64, 72].map((value, index) => (
+              <div key={value}>
+                <span style={{ height: `${value * 2}px` }} />
+                <small>{['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'][index]}</small>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="work-panel">
+          <PanelTitle eyebrow="Staff workload" title="Assignments" note="Live" />
+          <div className="workload-list">
+            {staffWorkload.map((item) => (
+              <div key={item.owner}>
+                <strong>{item.owner}</strong>
+                <span>{item.tasks} tasks, {item.leads} leads</span>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section className="dashboard-grid">
+        <article className="work-panel">
+          <PanelTitle eyebrow="Applications" title="Current stages" note={`${applications.length} active`} />
+          <div className="pipeline-list">
+            {applications.map((application) => (
+              <ProgressRow
+                key={application.id}
+                label={`${application.student} - ${application.stage}`}
+                progress={application.progress}
+              />
+            ))}
+          </div>
+        </article>
+
+        <article className="work-panel">
+          <PanelTitle eyebrow="Follow-ups" title="Due now" note={`${tasks.length} tasks`} />
+          <div className="task-list">
+            {tasks.slice(0, 4).map((task) => (
+              <div key={task.id}>
+                <span className="task-index">{task.priority.slice(0, 1)}</span>
+                <strong>{task.title}</strong>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+    </>
+  );
+}
+
+function LeadsView({ leadDraft, leads, onAddLead, onConvertLead, setLeadDraft }) {
+  return (
+    <section className="module-grid">
+      <form className="work-panel form-panel" onSubmit={onAddLead}>
+        <PanelTitle eyebrow="Lead capture" title="Add new enquiry" note="MVP" />
+        <label className="field">
+          <span>Student name</span>
+          <input
+            onChange={(event) => setLeadDraft((current) => ({ ...current, name: event.target.value }))}
+            placeholder="Student name"
+            value={leadDraft.name}
+          />
+        </label>
+        <label className="field">
+          <span>Preferred country</span>
+          <select
+            onChange={(event) => setLeadDraft((current) => ({ ...current, country: event.target.value }))}
+            value={leadDraft.country}
+          >
+            <option>Canada</option>
+            <option>Australia</option>
+            <option>United Kingdom</option>
+            <option>United States</option>
+          </select>
+        </label>
+        <label className="field">
+          <span>Preferred course</span>
+          <input
+            onChange={(event) => setLeadDraft((current) => ({ ...current, course: event.target.value }))}
+            placeholder="Course or program"
+            value={leadDraft.course}
+          />
+        </label>
+        <label className="field">
+          <span>Lead source</span>
+          <input
+            onChange={(event) => setLeadDraft((current) => ({ ...current, source: event.target.value }))}
+            placeholder="Website, referral, campaign"
+            value={leadDraft.source}
+          />
+        </label>
+        <button className="primary-button" type="submit">Add lead</button>
+      </form>
+
+      <article className="work-panel span-2">
+        <PanelTitle eyebrow="Lead management" title="Prospective students" note={`${leads.length} open leads`} />
+        <DataTable
+          columns={['Name', 'Country', 'Course', 'Counsellor', 'Status', 'Follow-up', 'Action']}
+          rows={leads.map((lead) => [
+            lead.name,
+            lead.country,
+            lead.course,
+            lead.counsellor,
+            <StatusBadge status={lead.status} />,
+            lead.nextFollowUp,
+            <button className="small-button" onClick={() => onConvertLead(lead)} type="button">Convert</button>,
+          ])}
+        />
+      </article>
+    </section>
+  );
+}
+
+function StudentsView({ students }) {
+  return (
+    <section className="work-panel">
+      <PanelTitle eyebrow="Student management" title="Complete student profiles" note={`${students.length} profiles`} />
+      <div className="student-grid">
+        {students.map((student) => (
+          <article className="student-card" key={student.id}>
+            <div className="student-card-head">
+              <div>
+                <h3>{student.name}</h3>
+                <p>{student.country} - {student.course}</p>
+              </div>
+              <StatusBadge status={student.stage} />
+            </div>
+            <dl>
+              <div><dt>Passport</dt><dd>{student.passport}</dd></div>
+              <div><dt>Academic</dt><dd>{student.academics}</dd></div>
+              <div><dt>English test</dt><dd>{student.english}</dd></div>
+              <div><dt>Experience</dt><dd>{student.work}</dd></div>
+              <div><dt>Counsellor</dt><dd>{student.counsellor}</dd></div>
+            </dl>
+            <div className="tag-list">
+              {student.tags.map((tag) => <span key={tag}>{tag}</span>)}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function DocumentsView({ documents, onSimulateUpload, onUpdateStatus, session }) {
+  return (
+    <section className="work-panel">
+      <PanelTitle eyebrow="Document management" title="Upload and verification queue" note={`${documents.length} files`} />
+      <div className="action-strip">
+        <button className="primary-button compact" onClick={onSimulateUpload} type="button">
+          {session.role === 'Student' ? 'Upload document' : 'Simulate student upload'}
+        </button>
+        <span>Categories: passport, academics, English test, SOP, financial, offer, visa, supporting files.</span>
+      </div>
+      <DataTable
+        columns={['Student', 'Category', 'File', 'Status', 'Reviewer', 'Actions']}
+        rows={documents.map((document) => [
+          document.student,
+          document.category,
+          document.file,
+          <StatusBadge status={document.status} />,
+          document.owner,
+          <div className="button-row">
+            <button className="small-button" onClick={() => onUpdateStatus(document.id, 'Approved')} type="button">Approve</button>
+            <button className="small-button muted" onClick={() => onUpdateStatus(document.id, 'Needs re-upload')} type="button">Re-upload</button>
+          </div>,
+        ])}
+      />
+    </section>
+  );
+}
+
+function ApplicationsView({ applications }) {
+  return (
+    <section className="work-panel">
+      <PanelTitle eyebrow="Application tracking" title="Institution and visa workflow" note="Customizable stages" />
+      <div className="stage-strip">
+        {pipelineStages.map((stage) => <span key={stage}>{stage}</span>)}
+      </div>
+      <div className="pipeline-list">
+        {applications.map((application) => (
+          <article className="application-row" key={application.id}>
+            <div>
+              <strong>{application.student}</strong>
+              <span>{application.institution} - {application.country} - {application.type}</span>
+            </div>
+            <StatusBadge status={application.stage} />
+            <ProgressRow label={`${application.progress}% complete`} progress={application.progress} />
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TasksView({ onAddTask, onCompleteTask, setTaskDraft, taskDraft, tasks }) {
+  return (
+    <section className="module-grid">
+      <form className="work-panel form-panel" onSubmit={onAddTask}>
+        <PanelTitle eyebrow="Task system" title="Create follow-up" note="Assign and track" />
+        <label className="field">
+          <span>Task title</span>
+          <input
+            onChange={(event) => setTaskDraft((current) => ({ ...current, title: event.target.value }))}
+            placeholder="Follow-up or internal task"
+            value={taskDraft.title}
+          />
+        </label>
+        <label className="field">
+          <span>Owner</span>
+          <select
+            onChange={(event) => setTaskDraft((current) => ({ ...current, owner: event.target.value }))}
+            value={taskDraft.owner}
+          >
+            <option>Maya Thapa</option>
+            <option>Aarav Sharma</option>
+            <option>Kabir Karki</option>
+          </select>
+        </label>
+        <label className="field">
+          <span>Due</span>
+          <select
+            onChange={(event) => setTaskDraft((current) => ({ ...current, due: event.target.value }))}
+            value={taskDraft.due}
+          >
+            <option>Today</option>
+            <option>Tomorrow</option>
+            <option>Next week</option>
+          </select>
+        </label>
+        <button className="primary-button" type="submit">Create task</button>
+      </form>
+
+      <article className="work-panel span-2">
+        <PanelTitle eyebrow="Follow-ups" title="Task board" note={`${tasks.length} tasks`} />
+        <DataTable
+          columns={['Task', 'Owner', 'Due', 'Priority', 'Status', 'Action']}
+          rows={tasks.map((task) => [
+            task.title,
+            task.owner,
+            task.due,
+            task.priority,
+            <StatusBadge status={task.status} />,
+            <button className="small-button" onClick={() => onCompleteTask(task.id)} type="button">Complete</button>,
+          ])}
+        />
+      </article>
+    </section>
+  );
+}
+
+function StudentPortalView({ applications, documents, onSimulateUpload, tasks }) {
+  const studentApplications = applications.filter((application) => application.student === 'Emma Thompson');
+  const studentDocuments = documents.filter((document) => document.student === 'Emma Thompson');
+  const pendingTasks = tasks.filter((task) => task.title.toLowerCase().includes('emma') || task.owner === 'Maya Thapa').slice(0, 3);
+
+  return (
+    <section className="portal-grid">
+      <article className="work-panel hero-panel">
+        <PanelTitle eyebrow="Student portal" title="Emma Thompson" note="Personal view" />
+        <p>Track application progress, upload requested documents, review pending requirements, and receive updates from Rinova Creation.</p>
+        <button className="primary-button compact" onClick={onSimulateUpload} type="button">Upload document</button>
+      </article>
+
+      <article className="work-panel">
+        <PanelTitle eyebrow="Applications" title="My status" note={`${studentApplications.length} active`} />
+        {studentApplications.map((application) => (
+          <ProgressRow
+            key={application.id}
+            label={`${application.institution} - ${application.stage}`}
+            progress={application.progress}
+          />
+        ))}
+      </article>
+
+      <article className="work-panel">
+        <PanelTitle eyebrow="Documents" title="Requirements" note={`${studentDocuments.length} uploaded`} />
+        <div className="mini-list">
+          {studentDocuments.map((document) => (
+            <div key={document.id}>
+              <strong>{document.category}</strong>
+              <StatusBadge status={document.status} />
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <article className="work-panel">
+        <PanelTitle eyebrow="Tasks" title="Pending requirements" note={`${pendingTasks.length} items`} />
+        <div className="mini-list">
+          {pendingTasks.map((task) => (
+            <div key={task.id}>
+              <strong>{task.title}</strong>
+              <span>{task.due}</span>
+            </div>
+          ))}
+        </div>
+      </article>
+    </section>
+  );
+}
+
+function PanelTitle({ eyebrow, note, title }) {
+  return (
+    <div className="panel-title">
+      <div>
+        <p className="eyebrow">{eyebrow}</p>
+        <h3>{title}</h3>
+      </div>
+      <span>{note}</span>
+    </div>
+  );
+}
+
+function DataTable({ columns, rows }) {
+  return (
+    <div className="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            {columns.map((column) => <th key={column}>{column}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((cell, cellIndex) => <td key={`${rowIndex}-${cellIndex}`}>{cell}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function StatusBadge({ status }) {
+  const className = status.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return <span className={`status-badge ${className}`}>{status}</span>;
+}
+
+function ProgressRow({ label, progress }) {
+  return (
+    <div className="progress-row">
+      <div>
+        <span>{label}</span>
+        <strong>{progress}%</strong>
+      </div>
+      <div className="progress-track">
+        <span style={{ width: `${progress}%` }} />
+      </div>
+    </div>
   );
 }
 
