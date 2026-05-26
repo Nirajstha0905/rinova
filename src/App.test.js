@@ -1,8 +1,30 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+beforeEach(() => {
+  window.localStorage.clear();
+});
+
+test('renders rinova creation login form', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(screen.getByRole('heading', { name: /sign in/i })).toBeInTheDocument();
+  expect(screen.getByText(/modern education consultancy and crm platform/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+  expect(screen.getByPlaceholderText(/enter your password/i)).toBeInTheDocument();
+});
+
+test('authenticates a demo user and shows protected crm dashboard', () => {
+  render(<App />);
+
+  fireEvent.change(screen.getByLabelText(/email/i), {
+    target: { value: 'admin@rinovacreation.com' },
+  });
+  fireEvent.change(screen.getByPlaceholderText(/enter your password/i), {
+    target: { value: 'demo-password' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+  expect(screen.getByText(/consultancy admin/i)).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /rinova operations overview/i })).toBeInTheDocument();
 });
