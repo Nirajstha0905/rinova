@@ -1,0 +1,42 @@
+export const DEMO_USERS = [
+  {
+    email: 'super@rinovacreation.com',
+    name: 'Nisha Rai',
+    role: 'Super Admin',
+    badge: 'Platform',
+    scope: 'All branches',
+    permissions: ['Dashboard', 'Leads', 'Students', 'Documents', 'Applications', 'Tasks', 'Student Portal'],
+  },
+  {
+    email: 'admin@rinovacreation.com',
+    name: 'Aarav Sharma',
+    role: 'Consultancy Admin',
+    badge: 'Admin',
+    scope: 'Rinova Creation Main Office',
+    permissions: ['Dashboard', 'Leads', 'Students', 'Documents', 'Applications', 'Tasks', 'Student Portal'],
+  },
+  {
+    email: 'counsellor@rinovacreation.com',
+    name: 'Maya Thapa',
+    role: 'Counsellor',
+    badge: 'Counsellor',
+    scope: 'Study Abroad Desk',
+    permissions: ['Dashboard', 'Leads', 'Students', 'Applications', 'Tasks'],
+  },
+  {
+    email: 'documents@rinovacreation.com',
+    name: 'Kabir Karki',
+    role: 'Documentation Officer',
+    badge: 'Docs',
+    scope: 'Document Verification',
+    permissions: ['Dashboard', 'Documents', 'Applications', 'Tasks'],
+  },
+  {
+    email: 'student@rinovacreation.com',
+    name: 'Emma Thompson',
+    role: 'Student',
+    badge: 'Student',
+    scope: 'Personal application portal',
+    permissions: ['Dashboard', 'Student Portal', 'Documents', 'Applications'],
+  },
+];
