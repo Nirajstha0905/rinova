@@ -21,9 +21,9 @@ export function LoginPage({
     <main className="auth-page">
       <section className="auth-intro" aria-label="Rinova Creation CRM summary">
         <div className="brand-lockup">
-          <span className="brand-mark">E</span>
+          <span className="brand-mark">R</span>
           <div>
-            <h1>Enrollystics</h1>
+            <h1>Rinova Creation</h1>
             <p>Modern Education Consultancy and CRM Platform</p>
           </div>
         </div>
