@@ -18,6 +18,7 @@ import leadFollowupRoutes from "./routes/leadFollowupRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
 import institutionRoutes from "./routes/institutionRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js"
+import documentRoutes from "./routes/documentRoutes.js"
 const app = express();
 
 app.use(cors({
@@ -49,6 +50,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/institutions', institutionRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/documents", documentRoutes);
+app.use(
+  "/uploads",
+  express.static(
+    path.join(process.cwd(), "uploads")
+  )
+);
 app.use((req, res, next) => {
   next(new ApiError(404, `Route not found: ${req.method} ${req.originalUrl}`));
 });
