@@ -17,11 +17,13 @@ import leadRoutes from "./routes/leadRoutes.js";
 import leadFollowupRoutes from "./routes/leadFollowupRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
 import institutionRoutes from "./routes/institutionRoutes.js";
-import courseRoutes from "./routes/courseRoutes.js"
-import documentRoutes from "./routes/documentRoutes.js"
-import activityRoutes from "./routes/activityRoutes.js"
+import courseRoutes from "./routes/courseRoutes.js";
+import documentRoutes from "./routes/documentRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
-import noteRoutes from "./routes/noteRoutes.js"
+import noteRoutes from "./routes/noteRoutes.js";
+import applicationStageRoutes from "./routes/applicationStageRoutes.js";
+import applicationHistoryRoutes from "./routes/applicationHistoryRoutes.js";
 const app = express();
 
 app.use(cors({
@@ -55,6 +57,8 @@ app.use('/api/institutions', institutionRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/activities", activityRoutes);
+app.use("/api/application-stages", applicationStageRoutes);
+app.use("/api/application-history", applicationHistoryRoutes);
 app.use(
   "/uploads",
   express.static(
