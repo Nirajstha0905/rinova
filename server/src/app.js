@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 // import AauthRoutes from './modules/auth/auth.routes.js';
 import fileRoutes from './modules/files/files.routes.js';
 // import leadRoutes from './modules/leads/lead.route.js';
-import noteRoutes from './modules/notes/notes.routes.js';
+// import noteRoutes from './modules/notes/notes.routes.js';
 // import taskRoutes from './modules/tasks/tasks.routes.js';
 // import userRoutes from './modules/users/users.routes.js';
 import errorHandler from './middleware/errorHandler.js';
@@ -21,6 +21,7 @@ import courseRoutes from "./routes/courseRoutes.js"
 import documentRoutes from "./routes/documentRoutes.js"
 import activityRoutes from "./routes/activityRoutes.js"
 import taskRoutes from "./routes/taskRoutes.js";
+import noteRoutes from "./routes/noteRoutes.js"
 const app = express();
 
 app.use(cors({
