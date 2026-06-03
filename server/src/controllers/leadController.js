@@ -76,8 +76,15 @@ export const createLead = async (req, res) => {
         assigned_to,
       },
     });
+    await logActivity({
+  user_id: req.user.id,
+  entity_type: "lead",
+  entity_id: lead.id,
+  action: "create",
+  description: `Lead ${lead.first_name} ${lead.last_name} created`,
+});
 
-    res.status(201).json(lead);
+    return res.status(201).json(lead);
   } catch (error) {
     console.error(error);
 
@@ -96,6 +103,13 @@ export const updateLead = async (req, res) => {
       },
       data: req.body,
     });
+      await logActivity({
+  user_id: req.user?.id,
+  entity_type: "lead",
+  entity_id: lead.id,
+  action: "update",
+  description: `Lead ${lead.first_name} ${lead.last_name} updated`,
+});
 
     res.status(200).json(lead);
   } catch (error) {
@@ -123,7 +137,13 @@ export const deleteLead = async (req, res) => {
         deleted_at: new Date(),
       },
     });
-
+      await logActivity({
+  user_id: req.user?.id,
+  entity_type: "lead",
+  entity_id: lead.id,
+  action: "delete",
+  description: `Lead ${lead.first_name} ${lead.last_name} deleted`,
+});
     res.status(200).json({
       message: "Lead deleted successfully",
     });

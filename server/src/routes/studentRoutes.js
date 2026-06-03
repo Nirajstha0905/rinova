@@ -1,4 +1,6 @@
 import express from 'express';
+
+import { protect } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 import {
@@ -11,7 +13,7 @@ import {
 
 router.get('/', getStudent);
 router.get('/:id', getStudentById);
-router.post('/', createStudent);
+router.post('/', protect, createStudent);
 router.put('/:id', updateStudent);
 router.delete('/:id', deleteStudent);
 

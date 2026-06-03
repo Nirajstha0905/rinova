@@ -1,5 +1,7 @@
 import prisma from "../config/db.js";
 
+import { logActivity } from "../utils/activityLogger.js";
+
 export const uploadDocument = async (req, res) => {
     try {
         const {
@@ -29,6 +31,16 @@ export const uploadDocument = async (req, res) => {
             },
         });
         res.status(201).json(document);
+        await logActivity({
+  user_id: req.user.id,
+  student_id,
+  entity_type: "document",
+  entity_id: document.id,
+  action: "upload",
+  description: `${doc_type} uploaded`,
+});
+
+        
     }
     catch (error)
     {
@@ -127,6 +139,14 @@ export const rejectDocument = async (req, res)=> {
                 rejection_reason,
             },
         });
+        await logActivity({
+  user_id: req.user.id,
+  student_id: document.student_id,
+  entity_type: "document",
+  entity_id: document.id,
+  action: "reject",
+  description: `${document.file_name} rejected`,
+});
         res.status(200).json(document);
     }
     catch (error){

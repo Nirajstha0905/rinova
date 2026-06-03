@@ -75,6 +75,13 @@ export const createFollowup = async (req, res) => {
             status: "scheduled",
   },
 });
+        await logActivity({
+  user_id: req.user.id,
+  entity_type: "followup",
+  entity_id: followup.id,
+  action: "create",
+  description: "Lead follow-up scheduled",
+});
         res.status(201).json(followup);
     }
     catch (error){

@@ -93,6 +93,14 @@ if (course.institution_id !== institution_id) {
                 stage: "preparation",
             },
         });
+        await logActivity({
+  user_id: req.user.id,
+  student_id: application.student_id,
+  entity_type: "application",
+  entity_id: application.id,
+  action: "create",
+  description: "Application submitted",
+});
         res.status(201).json(application);
     
     }
@@ -143,6 +151,14 @@ export const updateApplicationStage = async (req, res) => {
         remarks,
       },
     });
+    await logActivity({
+  user_id: req.user?.id,
+  student_id: application.student_id,
+  entity_type: "application",
+  entity_id: application.id,
+  action: "stage_change",
+  description: `Application moved to ${application.stage}`,
+});
 
     res.status(200).json(application);
   } catch (error) {
