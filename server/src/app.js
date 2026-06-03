@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import fileRoutes from './modules/files/files.routes.js';
 // import leadRoutes from './modules/leads/lead.route.js';
 import noteRoutes from './modules/notes/notes.routes.js';
-import taskRoutes from './modules/tasks/tasks.routes.js';
+// import taskRoutes from './modules/tasks/tasks.routes.js';
 // import userRoutes from './modules/users/users.routes.js';
 import errorHandler from './middleware/errorHandler.js';
 import ApiError from './utils/ApiError.js';
@@ -19,6 +19,8 @@ import applicationRoutes from "./routes/applicationRoutes.js";
 import institutionRoutes from "./routes/institutionRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js"
 import documentRoutes from "./routes/documentRoutes.js"
+import activityRoutes from "./routes/activityRoutes.js"
+import taskRoutes from "./routes/taskRoutes.js";
 const app = express();
 
 app.use(cors({
@@ -51,6 +53,7 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/institutions', institutionRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/activities", activityRoutes);
 app.use(
   "/uploads",
   express.static(
