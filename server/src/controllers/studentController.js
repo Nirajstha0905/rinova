@@ -187,3 +187,34 @@ export const deleteStudent = async (req, res) => {
     });
   }
 };
+
+//--------------TIMELINE CONTROLLER------------------------//
+export const getStudentTimeline = async (req, res) => {
+  try {
+    const timeline =
+      await prisma.activity_logs.findMany({
+        where: {
+          student_id: req.params.id,
+        },
+        include: {
+          users: {
+            select: {
+              first_name: true,
+              last_name: true,
+            },
+          },
+        },
+        orderBy: {
+          created_at: "desc",
+        },
+      });
+
+    res.status(200).json(timeline);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch timeline",
+    });
+  }
+};
