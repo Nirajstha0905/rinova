@@ -24,6 +24,8 @@ import taskRoutes from "./routes/taskRoutes.js";
 import noteRoutes from "./routes/noteRoutes.js";
 import applicationStageRoutes from "./routes/applicationStageRoutes.js";
 import applicationHistoryRoutes from "./routes/applicationHistoryRoutes.js";
+import academicRecordRoutes from "./routes/academicRecordRoutes.js";
+import testScoreRoutes from "./routes/testScoreRoutes.js";
 const app = express();
 
 app.use(cors({
@@ -59,6 +61,8 @@ app.use("/api/documents", documentRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/application-stages", applicationStageRoutes);
 app.use("/api/application-history", applicationHistoryRoutes);
+app.use("/api/academic-records",academicRecordRoutes);
+app.use("/api/test-scores", testScoreRoutes);
 app.use(
   "/uploads",
   express.static(
