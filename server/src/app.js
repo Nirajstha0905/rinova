@@ -28,6 +28,7 @@ import academicRecordRoutes from "./routes/academicRecordRoutes.js";
 import testScoreRoutes from "./routes/testScoreRoutes.js";
 import workExperienceRoutes from './routes/workExperienceRoutes.js';
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import visaApplicationRoutes from "./routes/visaApplicationRoutes.js";
 const app = express();
 
 app.use(cors({
@@ -67,6 +68,7 @@ app.use("/api/academic-records",academicRecordRoutes);
 app.use("/api/test-scores", testScoreRoutes);
 app.use("/api/work-experiences",workExperienceRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/visa-applications",visaApplicationRoutes);
 
 app.use(
   "/uploads",
