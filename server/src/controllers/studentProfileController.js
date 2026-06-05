@@ -92,8 +92,17 @@ export const getStudentProfile = async (req, res)=> {
                 message: "Student not found",
             });
         }
-
+        const summary = {
+            applications: applications.length,
+            documents: documents.length,
+            notes: notes.length,
+            academic_records: academicRecords.length,
+            work_experiences: workExperiences.length,
+            english_test_scores: testScores.length,
+            visa_applications: visaApplications.length,
+        };
         res.status(200).json({
+            summary,
             student,
             applications,
             documents,
