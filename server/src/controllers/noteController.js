@@ -13,6 +13,8 @@ export const getNotes = async (req, res)=> {
                         last_name: true,
                     },
                 },
+                students: true,
+                leads: true
             },
             orderBy:{
                 created_at : "desc",
@@ -53,6 +55,11 @@ export const getNotesById = async (req, res) => {
         res.status(200).json(notes);
     } catch(error){
         console.error(error);
+          if (error.code === "P2025") {
+    return res.status(404).json({
+      message: "Note not found",
+    });
+  }
         res.status(500).json({
             message: "Failed to fetch lead",
         });
@@ -84,6 +91,11 @@ export const createNote = async (req, res) => {
                 content,
                 created_by: req.user.id
             },
+        });
+        await createNotification({
+            user_id: req.user.id,
+            title: "New Note Added",
+            message: "A note was added to the student profile",
         });
 
         await logActivity({

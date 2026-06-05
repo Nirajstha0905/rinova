@@ -1,5 +1,5 @@
 import prisma from "../config/db.js";
-
+import { createNotification } from "../utils/notificationHelper.js";
 import { logActivity } from "../utils/activityLogger.js";
 
 export const uploadDocument = async (req, res) => {
@@ -31,14 +31,19 @@ export const uploadDocument = async (req, res) => {
             },
         });
         res.status(201).json(document);
-        await logActivity({
-  user_id: req.user.id,
-  student_id,
-  entity_type: "document",
-  entity_id: document.id,
-  action: "upload",
-  description: `${doc_type} uploaded`,
-});
+    await createNotification({
+        user_id: req.user.id,
+        title: "Document Uploaded",
+        message: `${doc_type} uploaded successfully`,
+    });
+    await logActivity({
+        user_id: req.user.id,
+        student_id,
+        entity_type: "document",
+        entity_id: document.id,
+        action: "upload",
+        description: `${doc_type} uploaded`,
+    });
 
         
     }
@@ -139,14 +144,20 @@ export const rejectDocument = async (req, res)=> {
                 rejection_reason,
             },
         });
+        await createNotification({
+            user_id: document.uploaded_by,
+            title: "Document Rejected",
+            message: `${document.doc_type} was rejected`,
+        });
+
         await logActivity({
-  user_id: req.user.id,
-  student_id: document.student_id,
-  entity_type: "document",
-  entity_id: document.id,
-  action: "reject",
-  description: `${document.file_name} rejected`,
-});
+            user_id: req.user.id,
+            student_id: document.student_id,
+            entity_type: "document",
+            entity_id: document.id,
+            action: "reject",
+            description: `${document.file_name} rejected`,
+        });
         res.status(200).json(document);
     }
     catch (error){

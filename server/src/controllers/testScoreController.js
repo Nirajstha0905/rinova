@@ -85,6 +85,11 @@ export const createTestScore = async (req, res)=> {
                 exam_date : exam_date ? new Date(exam_date): null,
             },
         });
+        await createNotification({
+            user_id: req.user.id,
+            title: "English Test Added",
+            message: `${exam_type} score recorded`,
+        });
 
         await logActivity({
             user_id: req.user.id,

@@ -1,5 +1,6 @@
 import prisma from "../config/db.js";
 import {logActivity} from "../utils/activityLogger.js";
+import { createNotification } from "../utils/notificationHelper.js";
 
 export const getVisaApplications = async (req, res) => {
     try {
@@ -89,6 +90,11 @@ export const createVisaApplication = async (
           remarks,
         },
       });
+      await createNotification({
+        user_id: req.user.id,
+        title: "Visa Application Created",
+        message: `${visa_type} application submitted`,
+      });
 
     await logActivity({
       user_id: req.user.id,
@@ -121,6 +127,13 @@ export const updateVisaApplication = async (
         },
         data: req.body,
       });
+      if (req.body.status &&req.body.status !== visa.status) {
+    await createNotification({
+      user_id: req.user.id,
+      title: "Visa Status Updated",
+      message: `Visa status changed to ${req.body.status}`,
+    });
+}
 
     await logActivity({
       user_id: req.user.id,

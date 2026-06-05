@@ -1,4 +1,5 @@
 import prisma from '../config/db.js';
+import { createNotification } from '../utils/notificationHelper.js';
 export const getFollowups = async (req, res) => {
     try {
         const followups = await prisma.lead_followups.findMany({
@@ -74,6 +75,11 @@ export const createFollowup = async (req, res) => {
             },
             status: "scheduled",
   },
+});
+await createNotification({
+  user_id: assigned_to,
+  title: "New Follow-up",
+  message: `A follow-up has been assigned to you`,
 });
         await logActivity({
   user_id: req.user.id,

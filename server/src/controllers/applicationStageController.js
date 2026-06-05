@@ -1,4 +1,5 @@
 import prisma from "../config/db.js"
+import { createNotification } from "../utils/notificationHelper.js";
 
 export const getStages = async (req, res)=> {
     try {
@@ -49,6 +50,11 @@ export const updateStage = async (req, res) => {
                 id: req.params.id,
             },
             data: req.body,
+        });
+        await createNotification({
+            user_id: req.user.id,
+            title: "Application Updated",
+            message: `Application moved to ${stage.name}`,
         });
 
         res.status(200).json(stage);

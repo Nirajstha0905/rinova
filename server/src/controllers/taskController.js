@@ -1,5 +1,6 @@
 import prisma from "../config/db.js";
 import { logActivity } from "../utils/activityLogger.js";
+import { createNotification }from "../utils/notificationHelper.js";
 
 export const getTasks = async (req, res) => {
   try {
@@ -86,6 +87,11 @@ export const createTask = async (req, res) => {
         due_date: due_date ? new Date(due_date) : null,
         priority,
       },
+    });
+    await createNotification({
+      user_id: assigned_to,
+      title: "New Task Assigned",
+      message: `Task "${title}" has been assigned to you`,
     });
 
     await logActivity({
