@@ -31,6 +31,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import visaApplicationRoutes from "./routes/visaApplicationRoutes.js";
 import timelineRoutes from "./routes/timelineRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import studentProfileRoutes from "./routes/studentProfileRoutes.js";
 const app = express();
 
 app.use(cors({
@@ -73,6 +74,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/visa-applications",visaApplicationRoutes);
 app.use("/api/timeline", timelineRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/students",studentProfileRoutes);
 
 app.use(
   "/uploads",
