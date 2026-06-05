@@ -33,7 +33,7 @@ export const getNotesById = async (req, res) => {
     try {
         const notes = await prisma.notes.findUnique({
             where:{
-                id: req.params.id
+                id : req.params.id,
             },
             include:{
                 users:{
@@ -44,15 +44,13 @@ export const getNotesById = async (req, res) => {
                     },
                 },
             },
-            orderBy:{
-                created_at : "desc",
-            },
         });
         if(!notes){
             return res.status(404).json({
                 message: "Note not found",
             });
         } 
+        res.status(200).json(notes);
     } catch(error){
         console.error(error);
         res.status(500).json({
