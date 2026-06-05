@@ -29,6 +29,40 @@ export const getNotes = async (req, res)=> {
     }
 };
 
+export const getNotesById = async (req, res) => {
+    try {
+        const notes = await prisma.notes.findUnique({
+            where:{
+                id: req.params.id
+            },
+            include:{
+                users:{
+                    select:{
+                        first_name: true,
+                        middle_name: true,
+                        last_name: true,
+                    },
+                },
+            },
+            orderBy:{
+                created_at : "desc",
+            },
+        });
+        if(!notes){
+            return res.status(404).json({
+                message: "Note not found",
+            });
+        } 
+    } catch(error){
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to fetch lead",
+        });
+    }
+};
+
+
+
 export const createNote = async (req, res) => {
     try {
         const {
@@ -55,12 +89,12 @@ export const createNote = async (req, res) => {
         });
 
         await logActivity({
-                  user_id: req.user.id,
-      student_id,
-      entity_type: "note",
-      entity_id: note.id,
-      action: "create",
-      description: "Note created",
+            user_id: req.user.id,
+            student_id,
+            entity_type: "note",
+            entity_id: note.id,
+            action: "create",
+            description: "Note created",
         });
         res.status(201).json(note);
     }
@@ -68,8 +102,8 @@ export const createNote = async (req, res) => {
         console.error(error);
 
            res.status(500).json({
-      message: "Failed to create note",
-    });
+                message: "Failed to create note",
+            });
         
     }
 };
@@ -80,6 +114,14 @@ export const deleteNote = async (req, res) => {
         id: req.params.id,
       },
     });
+    await logActivity({
+  user_id: req.user.id,
+  student_id: note.student_id,
+  entity_type: "note",
+  entity_id: note.id,
+  action: "delete",
+  description: "Note deleted",
+});
 
     res.status(200).json({
       message: "Note deleted successfully",
