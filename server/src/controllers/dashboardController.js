@@ -1,7 +1,15 @@
 import prisma from "../config/db.js";
 
-export const getDashboardStats = async (req, res) => {
+export const getDashboardOverview = async (req, res) => {
   try {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate()+ 1);
+
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate()+ 7);
     const [
       totalStudents,
       totalLeads,
@@ -9,8 +17,14 @@ export const getDashboardStats = async (req, res) => {
       totalInstitutions,
       totalCourses,
       totalDocuments,
+
       pendingTasks,
       pendingFollowups,
+
+      todayTasks,
+      overdueTasks,
+
+      unreadNotifications,
     ] = await Promise.all([
       prisma.students.count({
         where: { deleted_at: null },
@@ -30,6 +44,35 @@ export const getDashboardStats = async (req, res) => {
       prisma.lead_followups.count({
         where: { status: "pending" },
       }),
+      prisma.tasks.count({
+        where: {
+          due_date: {
+            gte: today,
+            lt: tomorrow,
+          },
+          status:{
+            not: "completed",
+          }
+        }
+      }),
+
+      prisma.tasks.count({
+        where: {
+          due_date: {
+            lt: today,
+          },
+          status: {
+            not: "completed",
+          },
+        },
+      }),
+
+      prisma.notifications.count({
+        where: {
+          is_read: false,
+          user_id: req.user.id,
+        },
+      }),
     ]);
 
     res.status(200).json({
@@ -39,8 +82,14 @@ export const getDashboardStats = async (req, res) => {
       totalInstitutions,
       totalCourses,
       totalDocuments,
+
       pendingTasks,
       pendingFollowups,
+
+      todayTasks,
+      overdueTasks,
+
+      unreadNotifications,
     });
   } catch (error) {
     console.error(error);
