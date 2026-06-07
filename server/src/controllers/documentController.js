@@ -30,6 +30,12 @@ export const uploadDocument = async (req, res) => {
                 verification_status: "pending",
             },
         });
+        const safeDocuments = documents.map(doc => ({
+            ...doc,
+            file_size: doc.file_size?
+             Number(doc.file_size)
+             : null,
+}));
         res.status(201).json(document);
     await createNotification({
         user_id: req.user.id,
