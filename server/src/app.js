@@ -32,6 +32,8 @@ import visaApplicationRoutes from "./routes/visaApplicationRoutes.js";
 import timelineRoutes from "./routes/timelineRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import studentProfileRoutes from "./routes/studentProfileRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 const app = express();
 
 app.use(cors({
@@ -75,6 +77,8 @@ app.use("/api/visa-applications",visaApplicationRoutes);
 app.use("/api/timeline", timelineRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/students",studentProfileRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/reports",reportRoutes);
 
 app.use(
   "/uploads",
