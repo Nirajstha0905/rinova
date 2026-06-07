@@ -144,3 +144,4 @@ export const deleteFollowup = async (req, res) => {
         });
     }
 };
+
