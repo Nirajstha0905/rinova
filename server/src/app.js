@@ -34,6 +34,8 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import studentProfileRoutes from "./routes/studentProfileRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import DocumentChecklistRoutes from "./routes/documentChecklistRoutes.js";
+import followupRoutes from "./routes/followupRoutes.js";
 const app = express();
 
 app.use(cors({
@@ -79,6 +81,8 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/students",studentProfileRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/reports",reportRoutes);
+app.use("/api/students", DocumentChecklistRoutes);
+app.use("/api/followups", followupRoutes);
 
 app.use(
   "/uploads",
