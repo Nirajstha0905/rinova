@@ -2,6 +2,11 @@ import bcrypt from "bcrypt";
 import prisma from "../config/db.js";
 import {generateToken} from "../utils/generateToken.js";
 
+const safeUser = (user) => {
+    const { password_hash, ...publicUser } = user;
+    return publicUser;
+};
+
 export const register = async (req, res) => {
     try {
         const {
@@ -36,12 +41,15 @@ export const register = async (req, res) => {
                     password_hash,
                     role_id,
                 },
+                include: {
+                    roles: true,
+                },
             });
         const token = generateToken(user);
 
             res.status(201).json({
                 token,
-                user});
+                user: safeUser(user)});
         }  
         catch (error){
             console.error("Error creating user:", error);
@@ -59,6 +67,9 @@ export const login = async (req, res) => {
             where: {
                 email,
             },
+            include: {
+                roles: true,
+            },
         });
         if(!user) {
             return res.status(400).json({
@@ -75,7 +86,7 @@ export const login = async (req, res) => {
             });
         }
         const token = generateToken(user);
-        res.status(200).json({ token, user });
+        res.status(200).json({ token, user: safeUser(user) });
     } catch (error) {
         console.error("Error during login:", error);
         res.status(500).json({
