@@ -7,6 +7,7 @@ import { getSavedSession, resetScrollPosition } from './utils/auth';
 import { getModuleDescription } from './utils/moduleDescriptions';
 import { LoginPage } from './components/auth/LoginPage';
 import { Shell } from './components/layout/Shell';
+import {loginUser} from "./services/authService";
 
 function App() {
   const [session, setSession] = useState(getSavedSession);
@@ -114,30 +115,44 @@ function App() {
     setErrors({});
   };
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
 
-    if (isLocked) {
-      setMessage('Too many failed attempts. Contact your CRM administrator to unlock this device.');
+    if(isLocked){
+      setMessage("Too many failed attempts.");
       return;
     }
-
-    if (!validate()) {
+    if(!validate()){
       return;
     }
+    try{
+      const data = await loginUser(
+       {email: form.email,
+        password: form.password}  
+        
+      );
+      const nextSession = {
+        token: data.token,
+        user: data.user,
+      };
+      localStorage.setItem(
+        "rinova-session",
+        JSON.stringify(nextSession)
+      );
+      setSession(nextSession);
 
-    const matchedUser = DEMO_USERS.find(
-      (user) => user.email.toLowerCase() === form.email.trim().toLowerCase()
-    );
-
-    if (!matchedUser) {
+      setMessage("");
+      setAttempts(0);
+    } catch (error){
       const nextAttempts = attempts + 1;
+
       setAttempts(nextAttempts);
-      setMessage(`No demo role found for this email. ${5 - nextAttempts} attempt${5 - nextAttempts === 1 ? '' : 's'} remaining.`);
-      return;
+
+      setMessage(error.response?.data?.message || 
+        "Login failed"
+      );
     }
 
-    signInUser(matchedUser);
   };
 
   const quickLogin = (user) => {
