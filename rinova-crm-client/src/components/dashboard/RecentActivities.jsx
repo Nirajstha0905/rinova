@@ -5,6 +5,23 @@ export default function RecentActivities({ activities = [] }) {
     const date = new Date(value);
     return Number.isNaN(date.getTime()) ? "No date" : date.toLocaleDateString();
   };
+const getActionStyle = (action = "") => {
+  const normalized = action.toLowerCase();
+
+  if (normalized.includes("create"))
+    return "bg-green-100 text-green-700";
+
+  if (normalized.includes("upload"))
+    return "bg-blue-100 text-blue-700";
+
+  if (normalized.includes("update"))
+    return "bg-yellow-100 text-yellow-700";
+
+  if (normalized.includes("delete"))
+    return "bg-red-100 text-red-700";
+
+  return "bg-slate-100 text-slate-700";
+};
 
   return (
     <div className="bg-white border border-[#e4ebf7] rounded-2xl shadow-[0_16px_35px_rgba(27,39,74,0.05)] p-6">
@@ -24,7 +41,12 @@ export default function RecentActivities({ activities = [] }) {
                 <p className="font-semibold text-sm text-slate-950">
                   {activity.userName}
                 </p>
-                <p className="text-slate-600 text-sm">{activity.action}</p>
+
+                <p className="text-slate-600 text-sm">{activity.description}</p>
+                <span
+                  className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${getActionStyle(activity.action)}`}>
+                    {activity.action}
+                </span>
                 <p className="text-slate-400 text-xs mt-1">
                   {formatDate(activity.createdAt)}
                 </p>

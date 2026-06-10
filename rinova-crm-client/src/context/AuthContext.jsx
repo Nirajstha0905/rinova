@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import * as authApi from "../api/authApi";
 
@@ -18,12 +18,18 @@ const buildFullName = (user) =>
     .join(" ")
     .trim();
 
+const normalizeRoleName = (roleName = "") =>
+  roleName.toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+
 const normalizeUser = (user) => {
   if (!user) return null;
 
+  const roleName = user.roles?.name || user.role || user.role_name || "";
+
   return {
     ...user,
-    full_name: user.full_name || buildFullName(user) || user.email || "User",
+    roles: user.roles || (roleName ? { name: roleName } : undefined),
+    full_name: user.full_name || user.name || buildFullName(user) || user.email || "User",
   };
 };
 
@@ -49,26 +55,63 @@ const getStoredUser = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getStoredUser);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const saveUser = useCallback((nextUser) => {
+    const normalized = normalizeUser(nextUser);
+    setUser(normalized);
+
+    if (normalized) {
+      localStorage.setItem(USER_KEY, JSON.stringify(normalized));
+    }
+
+    return normalized;
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    const token = localStorage.getItem(SESSION_KEY);
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return null;
+    }
+
+    try {
+      const profile = await authApi.getMe();
+      return saveUser(profile);
+    } catch (err) {
+      removeSession();
+      setUser(null);
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [saveUser]);
+
+  useEffect(() => {
+    const request = Promise.resolve().then(refreshUser);
+
+    return () => {
+      request.catch(() => {});
+    };
+  }, [refreshUser]);
+
   const login = async (email, password) => {
-    setLoading(true);
     setError(null);
     try {
       const data = await authApi.login(email, password);
-      const nextUser = normalizeUser(data.user);
-
       localStorage.setItem(SESSION_KEY, data.token);
-      localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-      setUser(nextUser);
+
+      const profile = await authApi.getMe().catch(() => data.user);
+      saveUser(profile);
+
       return data;
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || "Login failed";
       setError(errorMsg);
       throw new Error(errorMsg, { cause: err });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -85,20 +128,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const userRole = user?.roles?.name || user?.role || "";
+
   const isRole = (roleName) => {
-    if (!user?.roles?.name) return false;
-    return user.roles.name.toLowerCase() === roleName.toLowerCase();
+    if (!userRole) return false;
+    return normalizeRoleName(userRole) === normalizeRoleName(roleName);
   };
+
+  const hasAnyRole = (roles = []) =>
+    roles.some((roleName) => normalizeRoleName(roleName) === normalizeRoleName(userRole));
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        userRole,
         loading,
         error,
         login,
         logout,
+        refreshUser,
         isRole,
+        hasAnyRole,
         isAuthenticated: !!user,
       }}
     >

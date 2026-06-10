@@ -4,10 +4,19 @@ const unwrapData = (response) => response.data?.data ?? response.data;
 
 const toAuthError = (error, fallbackMessage) => {
   if (error.response?.data?.message) {
-    return new Error(error.response.data.message, { cause: error });
+    const message = error.response.data.message;
+    const normalizedMessage = message.toLowerCase();
+    if (
+      normalizedMessage.includes("invalid") ||
+      normalizedMessage.includes("credentials")
+    ) {
+      return new Error("Incorrect email or password.", { cause: error });
+    }
+
+    return new Error(message, { cause: error });
   }
   if (error.response?.status === 401) {
-    return new Error("Invalid email or password", { cause: error });
+    return new Error("Incorrect email or password.", { cause: error });
   }
   if (error.response?.status === 400) {
     return new Error("Email and password are required", { cause: error });
@@ -41,7 +50,7 @@ export const register = async (userData) => {
 
 export const getMe = async () => {
   try {
-    const response = await api.get("/auth/me");
+    const response = await api.get("/users/profile");
     return unwrapData(response);
   } catch (error) {
     throw toAuthError(error, "Failed to load user");

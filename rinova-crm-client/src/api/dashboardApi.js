@@ -64,6 +64,7 @@ const normalizeRecentActivities = (data) =>
       userName,
       action: asText(activity?.action ?? activity?.description, "Activity recorded"),
       createdAt: activity?.created_at ?? null,
+      description: asText(activity?.description ?? "None"),
     };
   });
 
