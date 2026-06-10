@@ -5,6 +5,12 @@ export const getDashboardOverview = async (req, res) => {
     const today = new Date();
     today.setHours(0,0,0,0);
 
+    const startOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    );
+
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate()+ 1);
 
@@ -12,6 +18,7 @@ export const getDashboardOverview = async (req, res) => {
     nextWeek.setDate(today.getDate()+ 7);
     const [
       totalStudents,
+      studentsThisMonth,
       totalLeads,
       totalApplications,
       totalInstitutions,
@@ -27,7 +34,12 @@ export const getDashboardOverview = async (req, res) => {
       unreadNotifications,
     ] = await Promise.all([
       prisma.students.count({
-        where: { deleted_at: null },
+        where: {
+          created_at: {
+            gte: startOfMonth,
+          },
+          deleted_at: null,
+         },
       }),
       prisma.leads.count(),
       prisma.applications.count({
@@ -77,6 +89,7 @@ export const getDashboardOverview = async (req, res) => {
 
     res.status(200).json({
       totalStudents,
+      studentsThisMonth,
       totalLeads,
       totalApplications,
       totalInstitutions,

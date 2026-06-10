@@ -36,9 +36,16 @@ export default function StatCard({ stats = [] }) {
               })()}
             </div>
           </div>
-          <div className="mt-5 h-1.5 rounded-full bg-[#edf2fb] overflow-hidden">
-            <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-[#2558ff] to-[#9b3bff]" />
-          </div>
+{item.title === "Students" && (
+  <div className="mt-4 flex items-center gap-2">
+    <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs font-semibold text-green-700">
+      +{item.monthlyAdded ?? 0}
+    </span>
+    <span className="text-xs text-slate-500">
+      added this month
+    </span>
+  </div>
+)} 
         </div>
       ))}
     </div>

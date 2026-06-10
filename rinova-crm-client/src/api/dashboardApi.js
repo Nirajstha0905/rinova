@@ -2,6 +2,7 @@ import api from "../services/axios";
 
 const emptyOverview = {
   totalStudents: 0,
+  studentsThisMonth: 0,
   totalLeads: 0,
   totalApplications: 0,
   totalInstitutions: 0,
@@ -12,6 +13,7 @@ const emptyOverview = {
   todayTasks: 0,
   overdueTasks: 0,
   unreadNotifications: 0,
+
 };
 
 const unwrapData = (response) => response.data?.data ?? response.data;

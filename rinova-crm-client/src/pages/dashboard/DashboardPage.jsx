@@ -95,7 +95,10 @@ export default function DashboardPage() {
   }
 
   const statCards = [
-    { title: "Students", value: overview?.totalStudents ?? 0 },
+    { title: "Students", 
+      value: overview?.totalStudents ?? 0,
+      monthlyAdded: overview?.studentsThisMonth ?? 0,
+    },
     { title: "Leads", value: overview?.totalLeads ?? 0 },
     { title: "Applications", value: overview?.totalApplications ?? 0 },
     { title: "Pending Tasks", value: overview?.pendingTasks ?? 0 },
