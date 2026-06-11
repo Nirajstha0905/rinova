@@ -132,17 +132,25 @@ export default function LoginForm() {
 
   const fillDemoCredentials = (demoType) => {
     const demos = {
-      admin: {
-        email: "admin@rinova.com",
-        password: "Admin@123",
+      super_admin: {
+        email: "anu@test.com",
+        password: "123456",
       },
-      staff: {
+      Consultancy_Admin: {
+        email: "niraj2@test.com",
+        password: "123456",
+      },
+      Counsellor: {
         email: "staff@rinova.com",
         password: "Staff@123",
       },
-      agent: {
-        email: "agent@rinova.com",
-        password: "Agent@123",
+      Documentation_Officer: {
+        email: "misha@test.com",
+        password: "123456",
+      },
+      Student: {
+        email: "niraj5@test.com",
+        password: "123456",
       },
     };
 
@@ -313,24 +321,38 @@ export default function LoginForm() {
         <div className="space-y-2">
           <button
             type="button"
-            onClick={() => fillDemoCredentials("admin")}
+            onClick={() => fillDemoCredentials("super_admin")}
             className="w-full text-left px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg transition text-sm font-medium text-purple-700 border border-purple-200"
           >
-            Admin Account
+            Super Admin Account
           </button>
           <button
             type="button"
-            onClick={() => fillDemoCredentials("staff")}
+            onClick={() => fillDemoCredentials("Consultancy_Admin")}
             className="w-full text-left px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition text-sm font-medium text-blue-700 border border-blue-200"
           >
-            Staff Account
+            Consultancy Admin Account
           </button>
           <button
             type="button"
-            onClick={() => fillDemoCredentials("agent")}
+            onClick={() => fillDemoCredentials("Documentation_Officer")}
             className="w-full text-left px-3 py-2 bg-green-50 hover:bg-green-100 rounded-lg transition text-sm font-medium text-green-700 border border-green-200"
           >
-            Agent Account
+            Documentation Officer Account
+          </button>
+          <button
+            type="button"
+            onClick={() => fillDemoCredentials("Counsellor")}
+            className="w-full text-left px-3 py-2 bg-green-50 hover:bg-green-100 rounded-lg transition text-sm font-medium text-green-700 border border-green-200"
+          >
+            Counsellor Account
+          </button>
+          <button
+            type="button"
+            onClick={() => fillDemoCredentials("Student")}
+            className="w-full text-left px-3 py-2 bg-green-50 hover:bg-green-100 rounded-lg transition text-sm font-medium text-green-700 border border-green-200"
+          >
+            Student Account
           </button>
         </div>
       </div>
