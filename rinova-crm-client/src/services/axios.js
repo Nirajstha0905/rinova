@@ -5,13 +5,25 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("rinova-session");
+  const session = localStorage.getItem(
+    "rinova-session"
+  );
 
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+  if (session) {
+    try {
+      const parsed = JSON.parse(session);
+
+      if (parsed.token) {
+        config.headers.Authorization =
+          `Bearer ${parsed.token}`;
+      }
+    } catch {
+      config.headers.Authorization =
+        `Bearer ${session}`;
     }
+  }
 
-    return config;
+  return config;
 });
 
 api.interceptors.response.use(

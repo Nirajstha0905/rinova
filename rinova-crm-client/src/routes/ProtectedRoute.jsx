@@ -1,6 +1,9 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+const normalizeRole = (role = "") =>
+  role.toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+
 export default function ProtectedRoute({ children, requiredRoles = null }) {
   const { isAuthenticated, loading, user } = useAuth();
 
@@ -19,7 +22,12 @@ export default function ProtectedRoute({ children, requiredRoles = null }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRoles && !requiredRoles.includes(user?.roles?.name)) {
+  if (
+    requiredRoles &&
+    !requiredRoles
+      .map((role) => normalizeRole(role))
+      .includes(normalizeRole(user?.roles?.name || user?.role))
+  ) {
     return <Navigate to="/login" replace />;
   }
 

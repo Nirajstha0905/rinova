@@ -58,11 +58,7 @@ export const getMe = async () => {
 };
 
 export const logout = async () => {
-  try {
-    await api.post("/auth/logout");
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
+  return;
 };
 
 /* Dummy data for testing (comment out above to use dummy data)

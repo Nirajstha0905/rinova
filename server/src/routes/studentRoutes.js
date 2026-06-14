@@ -1,8 +1,7 @@
 import express from 'express';
 
 import { protect } from '../middleware/authMiddleware.js';
-const router = express.Router();
-
+import { getStudentProfile } from "../controllers/studentProfileController.js";
 import {
     createStudent,
     getStudent,
@@ -11,8 +10,12 @@ import {
     deleteStudent,
 } from "../controllers/studentController.js";
 
+const router = express.Router();
+
+
 router.get('/', getStudent);
-router.get('/:id', getStudentById);
+router.get("/:id/profile", getStudentProfile);
+router.get("/:id", getStudentById);
 router.post('/', protect, createStudent);
 router.put('/:id', updateStudent);
 router.delete('/:id', deleteStudent);
