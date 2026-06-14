@@ -18,10 +18,13 @@ function App() {
   }
 
   return (
+<>
+    
     <Routes>
       <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
       <Route path="/*" element={isAuthenticated ? <AppRoutes /> : <Navigate to="/login" replace />} />
     </Routes>
+</>
   );
 }
 

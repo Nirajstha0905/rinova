@@ -103,7 +103,7 @@ export default function StudentProfilePage() {
              
           <div className="flex items-center gap-4">
                
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-[#2558ff] to-[#9b3bff] text-lg font-bold text-white">
+            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-linear-to-br from-[#2558ff] to-[#9b3bff] text-lg font-bold text-white">
                  
               {getInitials(student.name)}   
             </div>   
