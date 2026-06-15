@@ -11,7 +11,6 @@ import ReportPage from "../pages/reports/ReportPage";
 import NotificationPage from "../pages/notifications/NotificationPage";
 import SettingsPage from "../pages/settings/Settings";
 import ProtectedRoute from "./ProtectedRoute";
-import CreateStudentPage from "../pages/students/CreateStudentDrawer";
 
 export default function AppRoutes() {
   return (
@@ -57,7 +56,7 @@ export default function AppRoutes() {
         <Route
           path="/settings"
           element={
-            <ProtectedRoute allowedRoles={["Super Admin"]}>
+            <ProtectedRoute requiredRoles={["Super Admin"]}>
               <SettingsPage />
             </ProtectedRoute>
           }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { ArrowLeft, ArrowRight, GraduationCap, Mail, Phone, Search, Users, Plus } from "lucide-react";
+import { ArrowLeft, GraduationCap, Mail, Phone } from "lucide-react";
 import * as studentApi from "../../api/studentApi";
 import StudentProfileTabs from "../../components/student/StudentProfileTabs";
 
