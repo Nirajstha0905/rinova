@@ -58,3 +58,20 @@ export const createStudent = async (studentData) => {
 
   return response.data;
 };
+
+export const searchStudents = async (search) => {
+  const response = await api.get(
+    `/students?search=${search}`
+  );
+
+  return response.data;
+};
+export const updateStudent = async (id, payload) => {
+  const response = await  api.put(`/students/${id}`, payload);
+  return response.data;
+};
+
+export const deleteStudent = async (id) => {
+  const response = await api.delete(`/students/${id}`);
+  return response.data;
+};

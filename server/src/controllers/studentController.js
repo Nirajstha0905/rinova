@@ -11,9 +11,30 @@ const toNullableDate = (value) => {
 };
 export const getStudent = async (req, res) => {
   try {
+    const {search} = req.query;
     const students = await prisma.students.findMany({
       where: {
         deleted_at: null,
+        ...(search && {
+          OR:[
+            {
+              first_name: {
+                contains: search,
+                mode: "insensitive",
+              },
+              last_name: {
+                contains: search,
+                mode: "insensitive",
+              },
+            },
+            {
+              email: {
+                contains: search,
+                mode: "insensitive",
+              },
+            }
+          ]
+        })
       },
       orderBy: {
         created_at: "desc",

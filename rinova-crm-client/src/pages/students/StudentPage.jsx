@@ -9,9 +9,12 @@ import {
   Search,
   Users,
   Plus,
+  SquarePen,
+  Trash2
 } from "lucide-react";
 import * as studentApi from "../../api/studentApi";
-import CreateStudentDrawer from "./CreateStudentDrawer";  
+import CreateStudentDrawer from "./CreateStudentDrawer";
+import EditStudentDrawer from "./EditStudentDrawer";
 
 const getInitials = (name = "Student") =>
   name
@@ -53,6 +56,8 @@ export default function StudentPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [showCreateStudent, setShowCreateStudent] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showEditDrawer, setShowEditDrawer] = useState(false);
 
   const loadStudents = useCallback(async () => {
     try {
@@ -62,9 +67,7 @@ export default function StudentPage() {
       setStudents(data);
     } catch (err) {
       const message =
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to load students";
+        err.response?.data?.message || err.message || "Failed to load students";
       setError(message);
       toast.error(message);
     } finally {
@@ -92,12 +95,29 @@ export default function StudentPage() {
         student.preferredCountry,
         student.nationality,
         student.status,
+        student.passportNumber,
+        student.id,
       ]
         .join(" ")
         .toLowerCase()
         .includes(query),
     );
   }, [search, students]);
+  const handleDelete = async (id) => {
+    const confirmed = window.confirm("Delete this student?");
+
+    if (!confirmed) return;
+
+    try {
+      await studentApi.deleteStudent(id);
+
+      toast.success("Student deleted");
+
+      loadStudents();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete student");
+    }
+  };
 
   return (
     <>
@@ -155,7 +175,7 @@ export default function StudentPage() {
               <Search size={17} className="text-slate-400" />
               <input
                 value={search}
-                onChange={(event) => setSearch(event.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search students..."
                 className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
               />
@@ -220,7 +240,10 @@ export default function StudentPage() {
                     <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                       Joined
                     </th>
-                    <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <th
+                      colSpan={3}
+                      className="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    >
                       Action
                     </th>
                   </tr>
@@ -280,10 +303,31 @@ export default function StudentPage() {
                       <td className="px-5 py-4 text-right">
                         <button
                           type="button"
+                          onClick={() => {
+                            setSelectedStudent(student);
+                            setShowEditDrawer(true);
+                          }}
+                          className="rounded-xl px-3 py-2 text-sm transition hover:bg-[#6d35ff]  "
+                        >
+                          <SquarePen size={20} />
+                        </button>
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <button
+                          onClick={() => handleDelete(student.id)}
+                          className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-3 py-2 text-sm text-white hover:bg-red-700"
+                        >
+                          <Trash2 size={15} />
+                          Delete
+                        </button>
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <button
+                          type="button"
                           onClick={() => navigate(`/students/${student.id}`)}
                           className="inline-flex items-center gap-2 rounded-xl bg-[#111827] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1f2937]"
                         >
-                          View Details
+                          View
                           <ArrowRight size={15} />
                         </button>
                       </td>
@@ -298,6 +342,12 @@ export default function StudentPage() {
       <CreateStudentDrawer
         open={showCreateStudent}
         onClose={() => setShowCreateStudent(false)}
+        onSuccess={loadStudents}
+      />
+      <EditStudentDrawer
+        open={showEditDrawer}
+        student={selectedStudent}
+        onClose={() => setShowEditDrawer(false)}
         onSuccess={loadStudents}
       />
     </>
