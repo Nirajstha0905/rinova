@@ -1,6 +1,6 @@
 import prisma from "../config/db.js";
 
-export const createNotification = async ({
+export  const  createNotification = async ({
     user_id,
     title,
     message,

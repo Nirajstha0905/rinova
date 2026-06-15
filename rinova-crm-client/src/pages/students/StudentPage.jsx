@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -54,28 +54,30 @@ export default function StudentPage() {
   const [search, setSearch] = useState("");
   const [showCreateStudent, setShowCreateStudent] = useState(false);
 
-  useEffect(() => {
-    const request = Promise.resolve()
-      .then(async () => {
-        setLoading(true);
-        setError("");
-        const data = await studentApi.getStudents();
-        setStudents(data);
-      })
-      .catch((err) => {
-        const message =
-          err.response?.data?.message ||
-          err.message ||
-          "Failed to load students";
-        setError(message);
-        toast.error(message);
-      })
-      .finally(() => setLoading(false));
+  const loadStudents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const data = await studentApi.getStudents();
+      setStudents(data);
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to load students";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
+    const request = Promise.resolve().then(loadStudents);
     return () => {
       request.catch(() => {});
     };
-  }, []);
+  }, [loadStudents]);
 
   const filteredStudents = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -296,6 +298,7 @@ export default function StudentPage() {
       <CreateStudentDrawer
         open={showCreateStudent}
         onClose={() => setShowCreateStudent(false)}
+        onSuccess={loadStudents}
       />
     </>
   );

@@ -1,5 +1,7 @@
 export const mapStudentToApi = (data) => {
-  const {dial_code, ...rest } = data;
+  const { ...rest } = data;
+  delete rest.dial_code;
+
   return {
     ...rest,
 

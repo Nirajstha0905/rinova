@@ -2,6 +2,7 @@ import { useAuth } from "./context/AuthContext";
 import AppRoutes from "./routes/AppRoutes";
 import LoginPage from "./pages/auth/LoginPage";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
@@ -18,13 +19,38 @@ function App() {
   }
 
   return (
-<>
-    
-    <Routes>
-      <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
-      <Route path="/*" element={isAuthenticated ? <AppRoutes /> : <Navigate to="/login" replace />} />
-    </Routes>
-</>
+    <>
+      <Routes>
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
+        <Route path="/*" element={isAuthenticated ? <AppRoutes /> : <Navigate to="/login" replace />} />
+      </Routes>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            border: "1px solid #e4ebf7",
+            borderRadius: "14px",
+            boxShadow: "0 18px 40px rgba(27, 39, 74, 0.12)",
+            color: "#0f172a",
+            fontSize: "14px",
+            padding: "14px 16px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#10b981",
+              secondary: "#ffffff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#ffffff",
+            },
+          },
+        }}
+      />
+    </>
   );
 }
 

@@ -1,7 +1,14 @@
 import prisma from "../config/db.js";
 
 import { logActivity } from "../utils/activityLogger.js";
+import { createNotification } from "../utils/notificationHelper.js";
 
+const toNullableDate = (value) => {
+  if (!value) return null;
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
 export const getStudent = async (req, res) => {
   try {
     const students = await prisma.students.findMany({
@@ -71,39 +78,39 @@ export const createStudent = async (req, res) => {
     }
     const student = await prisma.students.create({
       data: {
-        first_name,
-        middle_name,
-        last_name,
-        email,
-        phone,
-        date_of_birth : req.body.date_of_birth 
-        ? new Date(req.body.date_of_birth)
-        : null,
-        address,
-        gender,
-        nationality,
-        passport_number,
-        passport_expiry,
-        preferred_country,
-        preferred_course,
-        status,
+        first_name: first_name.trim(),
+        middle_name: middle_name || null,
+        last_name: last_name.trim(),
+        email: email.trim(),
+        phone: phone || null,
+        date_of_birth: toNullableDate(date_of_birth),
+        address: address || null,
+        gender: gender || null,
+        nationality: nationality || null,
+        passport_number: passport_number || null,
+        passport_expiry: toNullableDate(passport_expiry),
+        preferred_country: preferred_country || null,
+        preferred_course: preferred_course || null,
+        status: status || "pending",
       },
     });
 
-    //------Activity Logger -----------------//
-    await logActivity({
-  user_id: req.user?.id,
-  student_id: student.id,
-  entity_type: "student",
-  entity_id: student.id,
-  action: "create",
-  description: `Student ${student.first_name} ${student.last_name} created`,
-});
-    await createNotification({
-      user_id: req.user.id,
-      title: "Student Added",
-      message: `${student.first_name} ${student.last_name} added successfully`,
-    });
+    await Promise.allSettled([
+      logActivity({
+        user_id: req.user?.id,
+        student_id: student.id,
+        entity_type: "student",
+        entity_id: student.id,
+        action: "create",
+        description: `Student ${student.first_name} ${student.last_name} created`,
+      }),
+      createNotification({
+        user_id: req.user?.id,
+        title: "Student Added",
+        message: `${student.first_name} ${student.last_name} added successfully`,
+      }),
+    ]);
+
     return res.status(201).json(student);
 
   } catch (error) {

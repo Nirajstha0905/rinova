@@ -234,6 +234,13 @@ const COURSES = [
   "Veterinary Science",
 ];
 
+const STATUSES = [
+  { value: "pending", label: "Pending" },
+  { value: "active", label: "Active" },
+  { value: "enrolled", label: "Enrolled" },
+  { value: "inactive", label: "Inactive" },
+];
+
 // flag emoji from country code
 const flag = (code) =>
   code
@@ -499,6 +506,20 @@ const Input = ({ label, error, ...props }) => (
   </div>
 );
 
+const Textarea = ({ label, error, ...props }) => (
+  <div className="space-y-1">
+    {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
+    <textarea
+      {...props}
+      className="min-h-24 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5
+        text-slate-800 shadow-sm outline-none transition
+        focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100
+        hover:border-slate-400"
+    />
+    {error && <p className="text-xs text-red-500 font-medium">{error.message}</p>}
+  </div>
+);
+
 const Section = ({ title, children }) => (
   <div className="rounded-2xl border bg-white shadow-sm p-5 space-y-4">
     <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</h3>
@@ -509,6 +530,24 @@ const Section = ({ title, children }) => (
 // ─────────────────────────────────────────────
 // MAIN DRAWER
 // ─────────────────────────────────────────────
+const FORM_DEFAULT_VALUES = {
+  first_name: "",
+  middle_name: "",
+  last_name: "",
+  email: "",
+  dial_code: "+977",
+  phone: "",
+  date_of_birth: "",
+  gender: "",
+  address: "",
+  nationality: "",
+  passport_number: "",
+  passport_expiry: "",
+  preferred_country: "",
+  preferred_course: "",
+  status: "pending",
+};
+
 export default function CreateStudentDrawer({ open, onClose, onSuccess }) {
   const {
     register,
@@ -518,7 +557,7 @@ export default function CreateStudentDrawer({ open, onClose, onSuccess }) {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(studentSchema),
-    defaultValues: { status: "pending", dial_code: "+1" },
+    defaultValues: FORM_DEFAULT_VALUES,
   });
 
   const [render, setRender]   = useState(open);
@@ -526,12 +565,15 @@ export default function CreateStudentDrawer({ open, onClose, onSuccess }) {
 
   useEffect(() => {
     if (open) {
-      setRender(true);
-    } else {
-      setAnimate(false);
-      const t = setTimeout(() => setRender(false), 300);
+      const t = setTimeout(() => setRender(true), 0);
       return () => clearTimeout(t);
     }
+
+    const t = setTimeout(() => {
+      setAnimate(false);
+      setRender(false);
+    }, 300);
+    return () => clearTimeout(t);
   }, [open]);
 
   useEffect(() => {
@@ -540,21 +582,46 @@ export default function CreateStudentDrawer({ open, onClose, onSuccess }) {
     return () => cancelAnimationFrame(id);
   }, [render]);
 
+  const handleClose = () => {
+    reset(FORM_DEFAULT_VALUES);
+    onClose();
+  };
+
   const onSubmit = async (data) => {
     try {
-      // merge dial_code into phone before mapping
+      const rawPhone = data.phone?.trim().replace(/\s+/g, "");
+      const phone = rawPhone
+        ? rawPhone.startsWith("+")
+          ? rawPhone
+          : `${data.dial_code ?? ""}${rawPhone}`
+        : undefined;
+
       const merged = {
         ...data,
-        phone: data.phone ? `${data.dial_code ?? ""}${data.phone}` : undefined,
+        phone,
       };
       const payload = mapStudentToApi(merged);
       const student = await createStudent(payload);
-      toast.success("Student created successfully");
+      const studentName = [payload.first_name, payload.last_name]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+
+      toast.success(
+        studentName
+          ? `${studentName} has been added successfully.`
+          : "Student created successfully."
+      );
       onSuccess?.(student);
-      reset();
+      reset(FORM_DEFAULT_VALUES);
       onClose();
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed to create student");
+      console.error("Create student failed:", err);
+      toast.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to create student"
+      );
     }
   };
 
@@ -671,7 +738,24 @@ export default function CreateStudentDrawer({ open, onClose, onSuccess }) {
                     />
                   )}
                 />
+
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <SelectDropdown
+                      label="Status"
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={STATUSES}
+                      placeholder="Select status"
+                      error={errors.status}
+                    />
+                  )}
+                />
               </div>
+
+              <Textarea label="Address" {...register("address")} error={errors.address} />
             </Section>
 
             {/* PASSPORT */}
