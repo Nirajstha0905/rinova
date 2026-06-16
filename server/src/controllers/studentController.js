@@ -153,10 +153,11 @@ export const updateStudent = async (req, res) => {
       where: {
         id: req.params.id,
       },
-      data: req.body,
+      data,
     });
 
     //--------------Activity Logger--------------//
+  
     await logActivity({
   user_id: req.user?.id,
   student_id: student.id,
