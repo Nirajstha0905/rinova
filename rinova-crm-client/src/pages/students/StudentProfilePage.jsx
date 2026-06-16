@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { ArrowLeft, GraduationCap, Mail, Phone } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  FileText,
+  Award,
+  PenLine,
+  Eye,
+  X,
+  Download,
+} from "lucide-react";
 import * as studentApi from "../../api/studentApi";
 import StudentProfileTabs from "../../components/student/StudentProfileTabs";
 
@@ -21,25 +31,192 @@ const formatDate = (date) =>
 /* -------------------- UI Components -------------------- */
 function DetailItem({ label, value }) {
   return (
-    <div className="rounded-xl border bg-white p-4 hover:border-violet-200 transition">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+    <div className="rounded-xl border border-slate-100 bg-white p-4 hover:border-slate-200 transition-colors">
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
         {label}
       </p>
-      <p className="mt-1 text-sm font-semibold text-slate-900 wrap-break-word">
+      <p className="mt-1.5 text-sm font-medium text-slate-800 break-words">
         {value || "—"}
       </p>
     </div>
   );
 }
 
-function SummaryCard({ title, value }) {
+function MetricCard({ title, value }) {
   return (
-    <div className="rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition">
-      <p className="text-xs font-semibold text-slate-500 uppercase">
+    <div className="rounded-xl bg-slate-50 p-4">
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
         {title}
       </p>
-      <div className="mt-3 flex items-end justify-between">
-        <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
+      <p className="mt-2 text-3xl font-semibold text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+const STATUS_STYLES = {
+  Active: "bg-emerald-50 text-emerald-700",
+  Inactive: "bg-slate-100 text-slate-500",
+  Pending: "bg-amber-50 text-amber-700",
+  Offered: "bg-emerald-50 text-emerald-700",
+  Submitted: "bg-slate-100 text-slate-500",
+  Rejected: "bg-red-50 text-red-600",
+};
+
+function StatusBadge({ status }) {
+  const style = STATUS_STYLES[status] ?? "bg-slate-100 text-slate-500";
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${style}`}
+    >
+      {status}
+    </span>
+  );
+}
+
+const DOC_ICONS = {
+  Passport: { icon: FileText, bg: "bg-violet-50", color: "text-violet-600" },
+  Transcripts: { icon: Award, bg: "bg-emerald-50", color: "text-emerald-600" },
+  default: { icon: PenLine, bg: "bg-amber-50", color: "text-amber-600" },
+};
+
+function DocIcon({ type }) {
+  const key =
+    Object.keys(DOC_ICONS).find((k) =>
+      type?.toLowerCase().includes(k.toLowerCase()),
+    ) ?? "default";
+  const { icon: Icon, bg, color } = DOC_ICONS[key];
+  return (
+    <div
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${bg}`}
+    >
+      <Icon size={16} className={color} />
+    </div>
+  );
+}
+
+/* -------------------- Document Viewer Overlay -------------------- */
+function DocumentViewer({ doc, onClose }) {
+  const isPdf = doc.file_name?.toLowerCase().endsWith(".pdf");
+  const isImage = /\.(png|jpe?g|webp|gif|svg)$/i.test(doc.file_name ?? "");
+
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    /* Backdrop */
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      {/* Panel */}
+      <div
+        className="relative flex w-full max-w-4xl flex-col rounded-2xl bg-white shadow-2xl"
+        style={{ maxHeight: "90vh" }}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4">
+          <DocIcon type={doc.document_type} />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-slate-900 truncate">
+              {doc.document_type}
+            </p>
+            <p className="text-xs text-slate-400 truncate">
+              {doc.file_name || "No file name"}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {doc.file_url && (
+              <a
+                href={doc.file_url}
+                download={doc.file_name}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+              >
+                <Download size={13} />
+                Download
+              </a>
+            )}
+            <button
+              onClick={onClose}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+              aria-label="Close viewer"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-auto rounded-b-2xl bg-slate-50">
+          {doc.file_url ? (
+            isPdf ? (
+              <iframe
+                src={doc.file_url}
+                className="h-full w-full"
+                style={{ minHeight: "70vh" }}
+                title={doc.file_name}
+              />
+            ) : isImage ? (
+              <div
+                className="flex items-center justify-center p-6"
+                style={{ minHeight: "60vh" }}
+              >
+                <img
+                  src={doc.file_url}
+                  alt={doc.document_type}
+                  className="max-h-[70vh] max-w-full rounded-xl object-contain shadow-sm"
+                />
+              </div>
+            ) : (
+              /* Unsupported format fallback */
+              <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+                  <FileText size={24} className="text-slate-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-slate-700">
+                    Preview not available
+                  </p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    This file type can't be previewed. Download it to view.
+                  </p>
+                </div>
+                {doc.file_url && (
+                  <a
+                    href={doc.file_url}
+                    download={doc.file_name}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-xs font-medium text-white hover:bg-violet-700 transition-colors"
+                  >
+                    <Download size={13} />
+                    Download file
+                  </a>
+                )}
+              </div>
+            )
+          ) : (
+            /* No URL fallback */
+            <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+                <FileText size={24} className="text-slate-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-700">
+                  No file attached
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  This document has no file URL.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -55,15 +232,14 @@ export default function StudentProfilePage() {
   const [activeTab, setActiveTab] = useState("Overview");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [viewingDoc, setViewingDoc] = useState(null); // doc being previewed
 
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
         setError("");
-
         const data = await studentApi.getStudentProfile(id);
-
         setStudent(data.student);
         setProfile(data);
       } catch (err) {
@@ -71,7 +247,6 @@ export default function StudentProfilePage() {
           err.response?.data?.message ||
           err.message ||
           "Failed to load student";
-
         setError(message);
         toast.error(message);
       } finally {
@@ -85,9 +260,9 @@ export default function StudentProfilePage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-violet-600 mx-auto" />
-          <p className="mt-2 text-sm text-slate-500">
-            Loading student profile...
+          <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-violet-600" />
+          <p className="mt-3 text-sm text-slate-400">
+            Loading student profile…
           </p>
         </div>
       </div>
@@ -97,7 +272,7 @@ export default function StudentProfilePage() {
   /* -------------------- Error -------------------- */
   if (error || !student) {
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
+      <div className="rounded-xl border border-red-100 bg-red-50 p-5 text-sm text-red-600">
         {error || "Student not found"}
       </div>
     );
@@ -106,132 +281,165 @@ export default function StudentProfilePage() {
   /* -------------------- Layout -------------------- */
   return (
     <div className="space-y-6">
+      {/* Document viewer overlay */}
+      {viewingDoc && (
+        <DocumentViewer doc={viewingDoc} onClose={() => setViewingDoc(null)} />
+      )}
 
       {/* Back */}
       <button
         onClick={() => navigate("/students")}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
       >
-        <ArrowLeft size={17} />
-        Back to Students
+        <ArrowLeft size={15} />
+        Back to students
       </button>
 
       {/* MAIN GRID */}
-      <div className="grid gap-6 lg:grid-cols-12">
-
-        {/* LEFT SIDEBAR */}
+      <div className="grid gap-5 lg:grid-cols-12">
+        {/* ── LEFT SIDEBAR ── */}
         <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-6 h-fit">
+          {/* Identity card */}
+          <div className="rounded-2xl border border-slate-100 bg-white p-6 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50 text-lg font-semibold text-violet-700">
+              {getInitials(student.name)}
+            </div>
+            <h1 className="mt-4 text-base font-semibold text-slate-900">
+              {student.name}
+            </h1>
+            <p className="mt-0.5 text-sm text-slate-400">
+              {student.preferredCourse}
+            </p>
+            <div className="mt-3">
+              <StatusBadge status={student.status} />
+            </div>
 
-          <div className="rounded-3xl border bg-white p-6 shadow-sm">
-            <div className="flex flex-col items-center text-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-linear-to-br from-indigo-600 to-violet-600 text-white text-xl font-bold">
-                {getInitials(student.name)}
-              </div>
-
-              <h1 className="mt-4 text-xl font-bold">{student.name}</h1>
-              <p className="text-sm text-slate-500">
-                {student.preferredCourse}
+            <div className="mt-5 space-y-2 border-t border-slate-50 pt-5 text-left">
+              <p className="flex items-center gap-2.5 text-sm text-slate-500">
+                <Mail size={14} className="text-slate-300 flex-shrink-0" />
+                <span className="truncate">{student.email}</span>
               </p>
+              <p className="flex items-center gap-2.5 text-sm text-slate-500">
+                <Phone size={14} className="text-slate-300 flex-shrink-0" />
+                {student.phone}
+              </p>
+            </div>
+          </div>
 
-              <span className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">
-                {student.status}
+          {/* Program interest */}
+          <div className="rounded-2xl border border-slate-100 bg-white p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">
+              Program interest
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-700">
+                {student.preferredCourse}
+              </span>
+              <span className="inline-flex items-center rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+                {student.preferredCountry}
               </span>
             </div>
-
-            <div className="mt-5 space-y-2 text-sm">
-              <p className="flex items-center gap-2 text-slate-600">
-                <Mail size={14} /> {student.email}
-              </p>
-              <p className="flex items-center gap-2 text-slate-600">
-                <Phone size={14} /> {student.phone}
-              </p>
-            </div>
           </div>
-
-          <div className="rounded-2xl border bg-white p-5">
-            <p className="text-xs font-semibold text-slate-500 uppercase">
-              Program Interest
-            </p>
-            <p className="mt-2 font-semibold">{student.preferredCourse}</p>
-            <p className="text-sm text-slate-500">
-              {student.preferredCountry}
-            </p>
-          </div>
-
         </div>
 
-        {/* RIGHT CONTENT */}
-        <div className="lg:col-span-8 space-y-6">
-
-          {/* SUMMARY */}
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <SummaryCard
+        {/* ── RIGHT CONTENT ── */}
+        <div className="lg:col-span-8 space-y-5">
+          {/* Metric cards */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <MetricCard
               title="Applications"
-              value={profile?.summary?.applications || 0}
+              value={profile?.summary?.applications ?? 0}
             />
-            <SummaryCard
+            <MetricCard
               title="Documents"
-              value={profile?.summary?.documents || 0}
+              value={profile?.summary?.documents ?? 0}
             />
-            <SummaryCard
-              title="Notes"
-              value={profile?.summary?.notes || 0}
-            />
-            <SummaryCard
-              title="Visa Cases"
-              value={profile?.summary?.visa_applications || 0}
+            <MetricCard title="Notes" value={profile?.summary?.notes ?? 0} />
+            <MetricCard
+              title="Visa cases"
+              value={profile?.summary?.visa_applications ?? 0}
             />
           </div>
 
-          {/* TABS */}
+          {/* Tabs */}
           <StudentProfileTabs
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />
 
-          {/* OVERVIEW */}
+          {/* ── OVERVIEW ── */}
           {activeTab === "Overview" && (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               <DetailItem label="Email" value={student.email} />
               <DetailItem label="Phone" value={student.phone} />
-              <DetailItem label="Date of Birth" value={formatDate(student.dob)} />
+              <DetailItem
+                label="Date of birth"
+                value={formatDate(student.dob)}
+              />
               <DetailItem label="Gender" value={student.gender} />
               <DetailItem label="Nationality" value={student.nationality} />
-              <DetailItem label="Passport Number" value={student.passportNumber} />
-              <DetailItem label="Preferred Country" value={student.preferredCountry} />
-              <DetailItem label="Preferred Course" value={student.preferredCourse} />
-              <DetailItem label="Address" value={student.address} />
-              <DetailItem label="Created At" value={formatDate(student.createdAt)} />
+              <DetailItem
+                label="Passport number"
+                value={student.passportNumber}
+              />
+              <DetailItem
+                label="Preferred country"
+                value={student.preferredCountry}
+              />
+              <DetailItem
+                label="Preferred course"
+                value={student.preferredCourse}
+              />
               <DetailItem label="Status" value={student.status} />
+              <div className="sm:col-span-2">
+                <DetailItem label="Address" value={student.address} />
+              </div>
+              <DetailItem
+                label="Created at"
+                value={formatDate(student.createdAt)}
+              />
             </div>
           )}
 
-          {/* APPLICATIONS */}
+          {/* ── APPLICATIONS ── */}
           {activeTab === "Applications" && (
-            <div className="rounded-2xl bg-white p-5">
+            <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
               <table className="w-full text-sm">
-                <thead className="text-left text-slate-500 border-b">
-                  <tr>
-                    <th className="py-2">Institution</th>
-                    <th>Course</th>
-                    <th>Intake</th>
-                    <th>Status</th>
-                    <th>Date</th>
+                <thead>
+                  <tr className="border-b border-slate-100">
+                    {["Institution", "Course", "Intake", "Status", "Date"].map(
+                      (h) => (
+                        <th
+                          key={h}
+                          className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-slate-400"
+                        >
+                          {h}
+                        </th>
+                      ),
+                    )}
                   </tr>
                 </thead>
-
                 <tbody>
                   {profile?.applications?.map((app) => (
-                    <tr key={app.id} className="border-b hover:bg-slate-50">
-                      <td className="py-3">{app.institutions?.name}</td>
-                      <td>{app.courses?.name}</td>
-                      <td>{app.intake || "—"}</td>
-                      <td>
-                        <span className="px-2 py-1 text-xs rounded-full bg-slate-100">
-                          {app.status}
-                        </span>
+                    <tr
+                      key={app.id}
+                      className="border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
+                    >
+                      <td className="px-4 py-3 font-medium text-slate-800">
+                        {app.institutions?.name}
                       </td>
-                      <td>{formatDate(app.created_at)}</td>
+                      <td className="px-4 py-3 text-slate-500">
+                        {app.courses?.name}
+                      </td>
+                      <td className="px-4 py-3 text-slate-500">
+                        {app.intake || "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={app.status} />
+                      </td>
+                      <td className="px-4 py-3 text-slate-400">
+                        {formatDate(app.created_at)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -239,50 +447,77 @@ export default function StudentProfilePage() {
             </div>
           )}
 
-          {/* DOCUMENTS */}
+          {/* ── DOCUMENTS ── */}
           {activeTab === "Documents" && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {profile?.documents?.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between rounded-xl border bg-white p-4"
+                  className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 hover:border-slate-200 transition-colors"
                 >
-                  <div>
-                    <p className="font-medium">{doc.document_type}</p>
-                    <p className="text-xs text-slate-500">
+                  <DocIcon type={doc.document_type} />
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-800">
+                      {doc.document_type}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">
                       {doc.file_name || "No file name"}
                     </p>
                   </div>
 
-                  <span className="text-xs text-slate-400">
+                  <span className="shrink-0 text-xs text-slate-300 mr-2">
                     {formatDate(doc.created_at)}
                   </span>
+
+                  <button
+                    onClick={() =>
+                      setViewingDoc({
+                        ...doc,
+                        file_url: `${
+                          import.meta.env.VITE_API_URL?.replace("/api", "") || 
+                          "http://localhost:5000"
+                        }/${doc.file_url.replace(/\\/g, "/")}`,
+                      })
+                    }
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 transition-colors"
+                  >
+                    <Eye size={13} />
+                    View
+                  </button>
                 </div>
               ))}
             </div>
           )}
 
-          {/* TIMELINE */}
+          {/* ── TIMELINE ── */}
           {activeTab === "Timeline" && (
-            <div className="space-y-4">
-              {profile?.timeline?.map((item) => (
-                <div
-                  key={item.id}
-                  className="rounded-xl border-l-4 border-violet-500 bg-white p-4"
-                >
-                  <p className="font-semibold">{item.description}</p>
-                  <p className="text-sm text-slate-500">
-                    {item.users?.first_name || "System"}{" "}
-                    {item.users?.last_name || ""}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {formatDate(item.created_at)}
-                  </p>
+            <div className="space-y-0">
+              {profile?.timeline?.map((item, i) => (
+                <div key={item.id} className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-violet-500" />
+                    {i < profile.timeline.length - 1 && (
+                      <div className="mt-1 flex-1 w-px bg-slate-100" />
+                    )}
+                  </div>
+                  <div className="pb-6">
+                    <p className="text-sm font-medium text-slate-800">
+                      {item.description}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      {[item.users?.first_name, item.users?.last_name]
+                        .filter(Boolean)
+                        .join(" ") || "System"}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-300">
+                      {formatDate(item.created_at)}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
           )}
-
         </div>
       </div>
     </div>
