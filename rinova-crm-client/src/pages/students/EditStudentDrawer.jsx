@@ -661,18 +661,19 @@ export default function EditStudentDrawer({
   const [render, setRender] = useState(open);
   const [animate, setAnimate] = useState(false);
 
-useEffect(() => {
-  if (open) {
-    setRender(true);
-  } else {
+  useEffect(() => {
+    if (open) {
+      const t = setTimeout(() => setRender(true), 0);
+      return () => clearTimeout(t);
+    }
+
     const t = setTimeout(() => {
       setAnimate(false);
       setRender(false);
     }, 300);
 
     return () => clearTimeout(t);
-  }
-}, [open]);
+  }, [open]);
 
   useEffect(() => {
     if (!render) return;
