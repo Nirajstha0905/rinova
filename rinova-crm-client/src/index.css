@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-primary: #6d35ff;
+  --color-primary-hover: #5a29db;
+  --color-secondary: #2558ff;
+  --color-cta: #111827;
+  --color-bg: #eef4ff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fbff;
+  --color-border: #e4ebf7;
+  --color-text: #0f172a;
+  --color-muted: #64748b;
+  --font-primary: Inter, sans-serif;
+}
+
 html,
 body,
 #root {
@@ -8,7 +24,121 @@ body,
 }
 
 body {
-  font-family: Inter, sans-serif;
-  background: #f8fafc;
-  color: #111827;
+  font-family: var(--font-primary);
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+.dark body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+@layer components {
+  .app-shell {
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .app-surface {
+    border-color: var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .app-muted-surface {
+    border-color: var(--color-border);
+    background: var(--color-surface-muted);
+  }
+
+  .app-primary-button {
+    background: var(--color-primary);
+    color: #ffffff;
+  }
+
+  .app-primary-button:hover {
+    background: var(--color-primary-hover);
+  }
+}
+
+.bg-violet-600,
+[class*="bg-[#6d35ff]"] {
+  background-color: var(--color-primary);
+}
+
+.hover\:bg-violet-700:hover,
+[class*="hover:bg-[#5a29db]"]:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.text-violet-600,
+[class*="text-[#6d35ff]"] {
+  color: var(--color-primary);
+}
+
+[class*="bg-[#2558ff]"] {
+  background-color: var(--color-secondary);
+}
+
+[class*="text-[#2558ff]"] {
+  color: var(--color-secondary);
+}
+
+.dark .bg-white,
+.dark .bg-white\/80,
+.dark .bg-white\/90,
+.dark .bg-white\/92 {
+  background-color: var(--color-surface);
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-gray-50,
+.dark [class*="bg-[#f8fbff]"],
+.dark [class*="bg-[#f7f9ff]"],
+.dark [class*="bg-[#f4f6fb]"],
+.dark [class*="bg-[#f7f9fd]"] {
+  background-color: var(--color-surface-muted);
+}
+
+.dark .text-slate-950,
+.dark .text-slate-900,
+.dark .text-gray-900,
+.dark .text-\[\#111827\] {
+  color: var(--color-text);
+}
+
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-slate-500,
+.dark .text-gray-700,
+.dark .text-gray-600,
+.dark .text-gray-500 {
+  color: var(--color-muted);
+}
+
+.dark .border,
+.dark .border-b,
+.dark .border-r,
+.dark [class*="border-[#"],
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-300 {
+  border-color: var(--color-border);
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  color: var(--color-text);
 }
