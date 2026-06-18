@@ -8,6 +8,7 @@ import {
   Settings,
   Sparkles,
   Users,
+  X,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -17,7 +18,13 @@ const menus = [
     name: "Dashboard",
     path: "/",
     icon: LayoutDashboard,
-    roles: ["Super Admin", "Consultancy Admin", "Counsellors", "Documentation Officers", "Students"],
+    roles: [
+      "Super Admin",
+      "Consultancy Admin",
+      "Counsellors",
+      "Documentation Officers",
+      "Students",
+    ],
   },
   {
     name: "Leads",
@@ -29,25 +36,46 @@ const menus = [
     name: "Students",
     path: "/students",
     icon: GraduationCap,
-    roles: ["Super Admin", "Consultancy Admin", "Counsellors", "Documentation Officers"],
+    roles: [
+      "Super Admin",
+      "Consultancy Admin",
+      "Counsellors",
+      "Documentation Officers",
+    ],
   },
   {
     name: "Applications",
     path: "/applications",
     icon: Briefcase,
-    roles: ["Super Admin", "Consultancy Admin", "Counsellors", "Documentation Officers", "Students"],
+    roles: [
+      "Super Admin",
+      "Consultancy Admin",
+      "Counsellors",
+      "Documentation Officers",
+      "Students",
+    ],
   },
   {
     name: "Documents",
     path: "/documents",
     icon: FileText,
-    roles: ["Super Admin", "Consultancy Admin", "Documentation Officers", "Students"],
+    roles: [
+      "Super Admin",
+      "Consultancy Admin",
+      "Documentation Officers",
+      "Students",
+    ],
   },
   {
     name: "Tasks",
     path: "/tasks",
     icon: ClipboardCheck,
-    roles: ["Super Admin", "Consultancy Admin", "Counsellors", "Documentation Officers"],
+    roles: [
+      "Super Admin",
+      "Consultancy Admin",
+      "Counsellors",
+      "Documentation Officers",
+    ],
   },
   {
     name: "Reports",
@@ -59,7 +87,13 @@ const menus = [
     name: "Notifications",
     path: "/notifications",
     icon: Bell,
-    roles: ["Super Admin", "Consultancy Admin", "Counsellors", "Documentation Officers", "Students"],
+    roles: [
+      "Super Admin",
+      "Consultancy Admin",
+      "Counsellors",
+      "Documentation Officers",
+      "Students",
+    ],
   },
   {
     name: "Settings",
@@ -69,37 +103,38 @@ const menus = [
   },
 ];
 
-export default function Sidebar() {
+function SidebarContent({ onNavigate }) {
   const location = useLocation();
   const { hasAnyRole } = useAuth();
   const visibleMenus = menus.filter((item) => hasAnyRole(item.roles));
   const isActive = (path) => location.pathname === path;
 
   return (
-    <aside className="hidden md:flex w-64 bg-white/92 border-r border-[#dde6f6] flex-col fixed left-0 top-0 h-screen">
-      <div className="p-6 border-b border-[#edf1f8]">
+    <>
+      <div className="border-b border-(--color-border) p-6">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 bg-gradient-to-br from-[#2558ff] to-[#9b3bff] rounded-2xl flex items-center justify-center text-white shadow-sm shadow-violet-200">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-(--color-secondary) to-(--color-primary) text-white shadow-sm shadow-violet-200 dark:shadow-none">
             <GraduationCap size={24} />
           </div>
           <div>
-            <h1 className="font-bold text-lg leading-tight bg-gradient-to-r from-[#2558ff] to-[#9b3bff] bg-clip-text text-transparent">
+            <h1 className="bg-linear-to-r from-(--color-secondary) to-(--color-primary) bg-clip-text text-lg font-bold leading-tight text-transparent">
               Rinova
             </h1>
-            <p className="text-xs text-slate-500">Education CRM</p>
+            <p className="text-xs text-(--color-muted)">Education CRM</p>
           </div>
         </div>
       </div>
 
-      <nav className="p-4 flex-1 space-y-1.5">
+      <nav className="flex-1 space-y-1.5 overflow-y-auto p-4">
         {visibleMenus.map((item) => (
           <Link
             key={item.name}
             to={item.path}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition ${
+            onClick={onNavigate}
+            className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${
               isActive(item.path)
-                ? "bg-[#f2f0ff] text-[#6d35ff] font-semibold shadow-sm"
-                : "text-slate-600 hover:bg-[#f7f9fd] hover:text-slate-950"
+                ? "bg-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] font-semibold text-(--color-primary) shadow-sm"
+                : "text-(--color-muted) hover:bg-(--color-surface-muted) hover:text-(--color-text)"
             }`}
           >
             <item.icon size={19} />
@@ -108,15 +143,47 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-[#edf1f8]">
-        <div className="rounded-2xl bg-[#f7f9ff] border border-[#e5ebf7] px-4 py-3">
-          <div className="flex items-center gap-2 text-[#6d35ff]">
+      <div className="border-t border-(--color-border) p-4">
+        <div className="rounded-2xl border border-(--color-border) bg-(--color-surface-muted) px-4 py-3">
+          <div className="flex items-center gap-2 text-(--color-primary)">
             <Sparkles size={16} />
             <p className="text-xs font-semibold">Rinova Creation</p>
           </div>
-          <p className="mt-1 text-xs text-slate-500">v1.0.0</p>
+          <p className="mt-1 text-xs text-(--color-muted)">v1.0.0</p>
         </div>
       </div>
-    </aside>
+    </>
+  );
+}
+
+export default function Sidebar({ mobileOpen = false, onMobileClose }) {
+  return (
+    <>
+      <aside className="app-surface fixed left-0 top-0 hidden h-screen w-64 flex-col border-r md:flex">
+        <SidebarContent />
+      </aside>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-slate-950/45"
+            onClick={onMobileClose}
+            aria-label="Close sidebar overlay"
+          />
+          <aside className="app-surface relative flex h-full w-72 max-w-[86vw] flex-col border-r shadow-2xl">
+            <button
+              type="button"
+              onClick={onMobileClose}
+              className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl text-(--color-muted) transition hover:bg-(--color-surface-muted) hover:text-(--color-text)"
+              aria-label="Close navigation"
+            >
+              <X size={18} />
+            </button>
+            <SidebarContent onNavigate={onMobileClose} />
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

@@ -47,6 +47,44 @@ export default function Navbar({ onMenuClick }) {
     };
   }, []);
 
+  //---------------------------------NOTIFICATION------------------------------//
+  const [openNotifications, setOpenNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadNotifications = async () => {
+    try {
+      setLoading(true);
+      const data = await notificationApi.getNotifications();
+      setNotifications(data);
+    } catch {
+      toast.error("Failed to load notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const loadUnread = async () => {
+      try {
+        const count = await notificationApi.getUnreadCount();
+        setUnreadCount(count);
+      } catch {
+        setUnreadCount(0);
+      }
+    };
+
+    loadUnread();
+  }, []);
+
+  const toggleNotifications = () => {
+    setOpenNotifications((prev) => {
+      const next = !prev;
+      if (next) loadNotifications();
+      return next;
+    });
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -69,30 +107,32 @@ export default function Navbar({ onMenuClick }) {
           <Menu size={20} />
         </button>
         <div className="min-w-0">
-        <p className="truncate text-xs font-medium text-(--color-muted)">
-          Modern Education Consultancy & CRM Platform
-        </p>
-        <h2 className="truncate text-lg font-semibold text-(--color-text) sm:text-xl">
-          Dashboard
-        </h2>
+          <p className="truncate text-xs font-medium text-(--color-muted)">
+            Modern Education Consultancy & CRM Platform
+          </p>
+          <h2 className="truncate text-lg font-semibold text-(--color-text) sm:text-xl">
+            Dashboard
+          </h2>
         </div>
       </div>
 
       <div className="flex shrink-0 items-center gap-2 sm:gap-4">
         <div className="hidden lg:flex items-center gap-2 w-72 rounded-xl bg-[#f4f6fb] border border-[#e7edf7] px-3 py-2">
           <Search size={17} className="text-slate-400" />
-          <span className="text-sm text-slate-400">Search students, leads...</span>
+          <span className="text-sm text-slate-400">
+            Search students, leads...
+          </span>
         </div>
 
         <ThemeToggle />
 
         <button
           type="button"
-          onClick={() => navigate("/notifications")}
+          onClick={toggleNotifications}
           className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-(--color-border) bg-(--color-surface-muted)"
-          aria-label="View notifications"
         >
-          <Bell size={20} className="text-(--color-muted) hover:text-(--color-text)" />
+          <Bell size={20} />
+
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-[#ff4d6d] rounded-full text-white text-[10px] flex items-center justify-center">
               {unreadCount > 9 ? "9+" : unreadCount}
@@ -110,7 +150,9 @@ export default function Navbar({ onMenuClick }) {
               {getInitials(displayName)}
             </div>
             <div className="hidden md:block text-left">
-              <p className="font-medium text-sm text-(--color-text)">{displayName}</p>
+              <p className="font-medium text-sm text-(--color-text)">
+                {displayName}
+              </p>
               <p className={`text-xs ${getRoleColor(displayRole)}`}>
                 {displayRole.toUpperCase()}
               </p>
@@ -120,8 +162,12 @@ export default function Navbar({ onMenuClick }) {
           {showDropdown && (
             <div className="app-surface absolute right-0 z-50 mt-2 min-w-48 rounded-xl border p-2 shadow-lg">
               <div className="mb-1 border-b border-(--color-border) px-3 py-2">
-                <p className="truncate text-sm font-semibold text-(--color-text)">{displayName}</p>
-                <p className={`text-xs ${getRoleColor(displayRole)}`}>{displayRole}</p>
+                <p className="truncate text-sm font-semibold text-(--color-text)">
+                  {displayName}
+                </p>
+                <p className={`text-xs ${getRoleColor(displayRole)}`}>
+                  {displayRole}
+                </p>
               </div>
               <button
                 type="button"
@@ -135,6 +181,52 @@ export default function Navbar({ onMenuClick }) {
           )}
         </div>
       </div>
+      {openNotifications && (
+  <div className="absolute right-4 top-16 w-96 max-h-105 overflow-hidden rounded-xl border bg-white shadow-xl z-50 flex flex-col">
+
+    {/* Header */}
+    <div className="flex items-center justify-between px-4 py-3 border-b">
+      <h3 className="font-semibold text-sm">Notifications</h3>
+
+      <button
+        onClick={async () => {
+          await notificationApi.markAllAsRead();
+          setUnreadCount(0);
+          loadNotifications();
+        }}
+        className="text-xs text-blue-600 hover:underline"
+      >
+        Mark all read
+      </button>
+    </div>
+
+    {/* List */}
+    <div className="overflow-y-auto flex-1">
+      {loading ? (
+        <p className="p-4 text-sm text-gray-500">Loading...</p>
+      ) : notifications.length === 0 ? (
+        <p className="p-4 text-sm text-gray-500">No notifications</p>
+      ) : (
+        notifications.map((n) => (
+          <div
+            key={n.id}
+            onClick={async () => {
+              await notificationApi.markAsRead(n.id);
+              loadNotifications();
+              setUnreadCount((c) => Math.max(c - 1, 0));
+            }}
+            className={`px-4 py-3 border-b cursor-pointer hover:bg-gray-50 ${
+              !n.is_read ? "bg-blue-50" : ""
+            }`}
+          >
+            <p className="text-sm font-medium">{n.title}</p>
+            <p className="text-xs text-gray-500">{n.message}</p>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+)}
     </header>
   );
 }
