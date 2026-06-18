@@ -9,6 +9,10 @@ export const defaultThemeTokens = {
   border: "#e4ebf7",
   text: "#0f172a",
   mutedText: "#64748b",
+
+  scrollbarTrack: "#f2f0ff",
+  scrollbarThumb: "#6d35ff",
+  scrollbarThumbHover: "#5a29db",
   fontPrimary: "Inter, sans-serif",
 };
 
@@ -19,6 +23,10 @@ export const darkThemeTokens = {
   border: "#24344d",
   text: "#eef4ff",
   mutedText: "#9fb0c7",
+
+  scrollbarTrack: "#0f1b2d",
+  scrollbarThumb: "#64748b",
+  scrollbarThumbHover: "#94a3b8",
 };
 
 export const themeStorageKey = "rinova-theme-settings";
@@ -37,6 +45,10 @@ export const applyThemeTokens = (tokens = defaultThemeTokens) => {
   root.style.setProperty("--color-text", tokens.text);
   root.style.setProperty("--color-muted", tokens.mutedText);
   root.style.setProperty("--font-primary", tokens.fontPrimary);
+
+  root.style.setProperty("--scrollbar-track", tokens.scrollbarTrack);
+  root.style.setProperty("--scrollbar-thumb", tokens.scrollbarThumb);
+  root.style.setProperty("--scrollbar-thumb-hover", tokens.scrollbarThumbHover);
 };
 
 export const mergeThemeTokens = (savedTokens) => ({

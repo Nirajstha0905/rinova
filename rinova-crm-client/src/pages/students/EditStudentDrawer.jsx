@@ -303,7 +303,7 @@ const SelectDropdown = ({
   return (
     <div className="relative space-y-1" ref={containerRef}>
       {label && (
-        <label className="text-sm font-medium text-slate-700">{label}</label>
+        <label className="text-sm font-medium text-(--color-text)">{label}</label>
       )}
 
       {/* trigger */}
@@ -311,18 +311,18 @@ const SelectDropdown = ({
         type="button"
         onClick={() => setOpen((p) => !p)}
         className={`
-          w-full rounded-xl border bg-white px-4 py-2.5 text-left
-          text-slate-800 shadow-sm outline-none transition flex items-center justify-between
-          hover:border-slate-400
-          ${open ? "border-indigo-500 ring-4 ring-indigo-100" : "border-slate-300"}
+          w-full rounded-xl border bg-(--color-surface) px-4 py-2.5 text-left
+          text-(--color-text) shadow-sm outline-none transition flex items-center justify-between
+          hover:border-(--color-border)
+          ${open ? "border-indigo-500 ring-4 ring-indigo-100" : "border-(--color-border)"}
           ${error ? "border-red-400" : ""}
         `}
       >
-        <span className={displayValue ? "text-slate-800" : "text-slate-400"}>
+        <span className={displayValue ? "text-(--color-text)" : "text-(--color-muted)"}>
           {displayValue ?? placeholder ?? "Select…"}
         </span>
         <svg
-          className={`w-4 h-4 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-(--color-muted) transition-transform ${open ? "rotate-180" : ""}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -338,12 +338,12 @@ const SelectDropdown = ({
 
       {/* dropdown panel */}
       {open && (
-        <div className="absolute z-9999 top-full mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+        <div className="absolute z-9999 top-full mt-1 w-full rounded-xl border border-(--color-border) bg-(--color-surface) shadow-xl overflow-hidden">
           {/* search */}
-          <div className="px-3 py-2 border-b border-slate-100">
-            <div className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-1.5">
+          <div className="px-3 py-2 border-b border-(--color-border)">
+            <div className="flex items-center gap-2 bg-(--color-surface-muted) rounded-lg px-3 py-1.5">
               <svg
-                className="w-3.5 h-3.5 text-slate-400 shrink-0"
+                className="w-3.5 h-3.5 text-(--color-muted) shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -360,7 +360,7 @@ const SelectDropdown = ({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search…"
-                className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                className="flex-1 bg-transparent text-sm text-(--color-text) outline-none placeholder:text-(--color-muted)"
               />
             </div>
           </div>
@@ -368,7 +368,7 @@ const SelectDropdown = ({
           {/* options list */}
           <ul className="max-h-52 overflow-y-auto py-1">
             {filtered.length === 0 ? (
-              <li className="px-4 py-2 text-sm text-slate-400">No results</li>
+              <li className="px-4 py-2 text-sm text-(--color-muted)">No results</li>
             ) : (
               filtered.map((opt) => {
                 const val = opt.value ?? opt;
@@ -382,7 +382,7 @@ const SelectDropdown = ({
                       ${
                         isSelected
                           ? "bg-indigo-50 text-indigo-700 font-medium"
-                          : "text-slate-700 hover:bg-slate-50"
+                          : "text-(--color-text) hover:bg-(--color-surface-muted)"
                       }
                     `}
                   >
@@ -456,26 +456,26 @@ const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
 
   return (
     <div className="relative space-y-1" ref={containerRef}>
-      <label className="text-sm font-medium text-slate-700">Phone</label>
+      <label className="text-sm font-medium text-(--color-text)">Phone</label>
 
       <div
-        className={`flex rounded-xl border bg-white shadow-sm transition overflow-hidden
-        ${error ? "border-red-400" : "border-slate-300 hover:border-slate-400 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-100"}`}
+        className={`flex rounded-xl border bg-(--color-surface) shadow-sm transition overflow-hidden
+        ${error ? "border-red-400" : "border-(--color-border) hover:border-(--color-border) focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-100"}`}
       >
         {/* dial code trigger */}
         <button
           type="button"
           onClick={() => setOpen((p) => !p)}
-          className="flex items-center gap-1.5 px-3 py-2.5 border-r border-slate-200 bg-slate-50 hover:bg-slate-100 transition shrink-0"
+          className="flex items-center gap-1.5 px-3 py-2.5 border-r border-(--color-border) bg-(--color-surface-muted) hover:bg-(--color-surface-muted) transition shrink-0"
         >
           <span className="text-base leading-none">
             {selected ? flag(selected.code) : "🌐"}
           </span>
-          <span className="text-sm font-medium text-slate-700">
+          <span className="text-sm font-medium text-(--color-text)">
             {dialValue || "+1"}
           </span>
           <svg
-            className={`w-3 h-3 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+            className={`w-3 h-3 text-(--color-muted) transition-transform ${open ? "rotate-180" : ""}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -494,17 +494,17 @@ const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
           {...phoneReg}
           type="tel"
           placeholder="Phone number"
-          className="flex-1 px-3 py-2.5 text-slate-800 text-sm outline-none bg-transparent"
+          className="flex-1 px-3 py-2.5 text-(--color-text) text-sm outline-none bg-transparent"
         />
       </div>
 
       {/* dial dropdown */}
       {open && (
-        <div className="absolute z-9999 top-full mt-1 w-full rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
-          <div className="px-3 py-2 border-b border-slate-100">
-            <div className="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-1.5">
+        <div className="absolute z-9999 top-full mt-1 w-full rounded-xl border border-(--color-border) bg-(--color-surface) shadow-xl overflow-hidden">
+          <div className="px-3 py-2 border-b border-(--color-border)">
+            <div className="flex items-center gap-2 bg-(--color-surface-muted) rounded-lg px-3 py-1.5">
               <svg
-                className="w-3.5 h-3.5 text-slate-400 shrink-0"
+                className="w-3.5 h-3.5 text-(--color-muted) shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -521,13 +521,13 @@ const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Country or code…"
-                className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                className="flex-1 bg-transparent text-sm text-(--color-text) outline-none placeholder:text-(--color-muted)"
               />
             </div>
           </div>
           <ul className="max-h-52 overflow-y-auto py-1">
             {filtered.length === 0 ? (
-              <li className="px-4 py-2 text-sm text-slate-400">No results</li>
+              <li className="px-4 py-2 text-sm text-(--color-muted)">No results</li>
             ) : (
               filtered.map((c) => (
                 <li
@@ -538,11 +538,11 @@ const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
                     setQuery("");
                   }}
                   className={`flex items-center gap-2 px-4 py-2 text-sm cursor-pointer transition
-                    ${c.dial === dialValue ? "bg-indigo-50 text-indigo-700 font-medium" : "text-slate-700 hover:bg-slate-50"}`}
+                    ${c.dial === dialValue ? "bg-indigo-50 text-indigo-700 font-medium" : "text-(--color-text) hover:bg-(--color-surface-muted)"}`}
                 >
                   <span className="text-base shrink-0">{flag(c.code)}</span>
                   <span className="flex-1 truncate">{c.name}</span>
-                  <span className="text-slate-400 shrink-0">{c.dial}</span>
+                  <span className="text-(--color-muted) shrink-0">{c.dial}</span>
                   {c.dial === dialValue && (
                     <svg
                       className="w-3.5 h-3.5 text-indigo-500 shrink-0"
@@ -578,14 +578,14 @@ const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
 const Input = ({ label, error, ...props }) => (
   <div className="space-y-1">
     {label && (
-      <label className="text-sm font-medium text-slate-700">{label}</label>
+      <label className="text-sm font-medium text-(--color-text)">{label}</label>
     )}
     <input
       {...props}
-      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5
-        text-slate-800 shadow-sm outline-none transition
+      className="w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-2.5
+        text-(--color-text) shadow-sm outline-none transition
         focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100
-        hover:border-slate-400"
+        hover:border-(--color-border)"
     />
     {error && (
       <p className="text-xs text-red-500 font-medium">{error.message}</p>
@@ -596,14 +596,14 @@ const Input = ({ label, error, ...props }) => (
 const Textarea = ({ label, error, ...props }) => (
   <div className="space-y-1">
     {label && (
-      <label className="text-sm font-medium text-slate-700">{label}</label>
+      <label className="text-sm font-medium text-(--color-text)">{label}</label>
     )}
     <textarea
       {...props}
-      className="min-h-24 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5
-        text-slate-800 shadow-sm outline-none transition
+      className="min-h-24 w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-2.5
+        text-(--color-text) shadow-sm outline-none transition
         focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100
-        hover:border-slate-400"
+        hover:border-(--color-border)"
     />
     {error && (
       <p className="text-xs text-red-500 font-medium">{error.message}</p>
@@ -612,8 +612,8 @@ const Textarea = ({ label, error, ...props }) => (
 );
 
 const Section = ({ title, children }) => (
-  <div className="rounded-2xl border bg-white shadow-sm p-5 space-y-4">
-    <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+  <div className="rounded-2xl border bg-(--color-surface) shadow-sm p-5 space-y-4">
+    <h3 className="text-xs font-semibold uppercase tracking-wider text-(--color-muted)">
       {title}
     </h3>
     {children}
@@ -736,18 +736,18 @@ export default function EditStudentDrawer({
           ${animate ? "translate-x-0" : "translate-x-full"}`}
       >
         {/* HEADER */}
-        <div className="flex items-start justify-between border-b bg-white/80 backdrop-blur-md px-6 py-5">
+        <div className="flex items-start justify-between border-b bg-(--color-surface)/80 backdrop-blur-md px-6 py-5">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">
+            <h2 className="text-2xl font-semibold text-(--color-text)">
               Update Student
             </h2>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-(--color-muted) mt-1">
               Edit your student profile to the system
             </p>
           </div>
           <button
             onClick={onClose}
-            className="h-10 w-10 rounded-xl flex items-center justify-center hover:bg-slate-100 text-slate-500 text-lg"
+            className="h-10 w-10 rounded-xl flex items-center justify-center hover:bg-(--color-surface-muted) text-(--color-muted) text-lg"
           >
             ✕
           </button>
@@ -755,7 +755,7 @@ export default function EditStudentDrawer({
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex-1 flex flex-col min-h-0"
+          className="flex-1 flex flex-col min-h-0 bg-(--color-surface-muted)"
         >
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
             {/* PERSONAL INFO */}
@@ -954,15 +954,15 @@ export default function EditStudentDrawer({
           </div>
 
           {/* FOOTER */}
-          <div className="shrink-0 border-t bg-white/90 backdrop-blur-md px-6 py-4 flex justify-between items-center">
-            <p className="text-xs text-slate-400">
+          <div className="shrink-0 border-t bg-(--color-surface)/90 backdrop-blur-md px-6 py-4 flex justify-between items-center">
+            <p className="text-xs text-(--color-muted)">
               All fields are securely stored
             </p>
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100"
+                className="px-5 py-2.5 rounded-xl border border-(--color-border) text-(--color-muted) hover:bg-(--color-surface-muted)"
               >
                 Cancel
               </button>

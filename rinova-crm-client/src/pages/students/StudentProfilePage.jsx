@@ -31,11 +31,11 @@ const formatDate = (date) =>
 /* -------------------- UI Components -------------------- */
 function DetailItem({ label, value }) {
   return (
-    <div className="rounded-xl border border-slate-100 bg-white p-4 hover:border-slate-200 transition-colors">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+    <div className="rounded-xl border border-(--color-border) bg-(--color-surface) p-4 transition-colors">
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-(--color-muted)">
         {label}
       </p>
-      <p className="mt-1.5 text-sm font-medium text-slate-800 break-words">
+      <p className="mt-1.5 text-sm font-medium text-(--color-text) break-words">
         {value || "—"}
       </p>
     </div>
@@ -44,26 +44,26 @@ function DetailItem({ label, value }) {
 
 function MetricCard({ title, value }) {
   return (
-    <div className="rounded-xl bg-slate-50 p-4">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+    <div className="rounded-xl bg-(--color-surface-muted) p-4 border border-(--color-border)">
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-(--color-muted)">
         {title}
       </p>
-      <p className="mt-2 text-3xl font-semibold text-slate-900">{value}</p>
+      <p className="mt-2 text-3xl font-semibold text-(--color-text)">{value}</p>
     </div>
   );
 }
 
 const STATUS_STYLES = {
   Active: "bg-emerald-50 text-emerald-700",
-  Inactive: "bg-slate-100 text-slate-500",
+  Inactive: "bg-(--color-surface-muted) text-(--color-muted)",
   Pending: "bg-amber-50 text-amber-700",
   Offered: "bg-emerald-50 text-emerald-700",
-  Submitted: "bg-slate-100 text-slate-500",
+  Submitted: "bg-(--color-surface-muted) text-(--color-muted)",
   Rejected: "bg-red-50 text-red-600",
 };
 
 function StatusBadge({ status }) {
-  const style = STATUS_STYLES[status] ?? "bg-slate-100 text-slate-500";
+  const style = STATUS_STYLES[status] ?? "bg-(--color-surface-muted) text-(--color-muted)";
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${style}`}
@@ -118,17 +118,17 @@ function DocumentViewer({ doc, onClose }) {
     >
       {/* Panel */}
       <div
-        className="relative flex w-full max-w-4xl flex-col rounded-2xl bg-white shadow-2xl"
+        className="relative flex w-full max-w-4xl flex-col rounded-2xl bg-(--color-surface) shadow-2xl"
         style={{ maxHeight: "90vh" }}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4">
+        <div className="flex items-center gap-3 border-b border-(--color-border) px-5 py-4">
           <DocIcon type={doc.document_type} />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-slate-900 truncate">
+            <p className="text-sm font-semibold text-(--color-text) truncate">
               {doc.document_type}
             </p>
-            <p className="text-xs text-slate-400 truncate">
+            <p className="text-xs text-(--color-muted) truncate">
               {doc.file_name || "No file name"}
             </p>
           </div>
@@ -137,7 +137,7 @@ function DocumentViewer({ doc, onClose }) {
               <a
                 href={doc.file_url}
                 download={doc.file_name}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 py-1.5 text-xs font-medium text-(--color-muted) hover:bg-(--color-surface-muted)transition-colors"
               >
                 <Download size={13} />
                 Download
@@ -145,7 +145,7 @@ function DocumentViewer({ doc, onClose }) {
             )}
             <button
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-(--color-muted) hover:bg-(--color-surface-muted) hover:text-(--color-text) transition-colors"
               aria-label="Close viewer"
             >
               <X size={16} />
@@ -154,7 +154,7 @@ function DocumentViewer({ doc, onClose }) {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-auto rounded-b-2xl bg-slate-50">
+        <div className="flex-1 overflow-auto rounded-b-2xl bg-(--color-surface-muted)">
           {doc.file_url ? (
             isPdf ? (
               <iframe
@@ -177,14 +177,14 @@ function DocumentViewer({ doc, onClose }) {
             ) : (
               /* Unsupported format fallback */
               <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-                  <FileText size={24} className="text-slate-400" />
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--color-surface-muted)">
+                  <FileText size={24} className="text-(--color-muted)" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-700">
+                  <p className="text-sm font-medium text-(--color-text)">
                     Preview not available
                   </p>
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs text-(--color-muted)">
                     This file type can't be previewed. Download it to view.
                   </p>
                 </div>
@@ -203,14 +203,14 @@ function DocumentViewer({ doc, onClose }) {
           ) : (
             /* No URL fallback */
             <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
-                <FileText size={24} className="text-slate-400" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--color-surface-muted)">
+                <FileText size={24} className="text-(--color-muted)" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-700">
+                <p className="text-sm font-medium text-(--color-text)">
                   No file attached
                 </p>
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-(--color-muted)">
                   This document has no file URL.
                 </p>
               </div>
@@ -260,8 +260,8 @@ export default function StudentProfilePage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-violet-600" />
-          <p className="mt-3 text-sm text-slate-400">
+          <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-(--color-border) border-t-violet-600" />
+          <p className="mt-3 text-sm text-(--color-muted)">
             Loading student profile…
           </p>
         </div>
@@ -289,7 +289,7 @@ export default function StudentProfilePage() {
       {/* Back */}
       <button
         onClick={() => navigate("/students")}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-(--color-muted) hover:text-(--color-text) transition-colors"
       >
         <ArrowLeft size={15} />
         Back to students
@@ -300,42 +300,42 @@ export default function StudentProfilePage() {
         {/* ── LEFT SIDEBAR ── */}
         <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-6 h-fit">
           {/* Identity card */}
-          <div className="rounded-2xl border border-slate-100 bg-white p-6 text-center">
+          <div className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-6 text-center">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50 text-lg font-semibold text-violet-700">
               {getInitials(student.name)}
             </div>
-            <h1 className="mt-4 text-base font-semibold text-slate-900">
+            <h1 className="mt-4 text-base font-semibold text-(--color-text)">
               {student.name}
             </h1>
-            <p className="mt-0.5 text-sm text-slate-400">
+            <p className="mt-0.5 text-sm text-(--color-muted)">
               {student.preferredCourse}
             </p>
             <div className="mt-3">
               <StatusBadge status={student.status} />
             </div>
 
-            <div className="mt-5 space-y-2 border-t border-slate-50 pt-5 text-left">
-              <p className="flex items-center gap-2.5 text-sm text-slate-500">
-                <Mail size={14} className="text-slate-300 flex-shrink-0" />
+            <div className="mt-5 space-y-2 border-t border-(--color-border) pt-5 text-left">
+              <p className="flex items-center gap-2.5 text-sm text-(--color-muted)">
+                <Mail size={14} className="text-(--color-muted) shrink-0" />
                 <span className="truncate">{student.email}</span>
               </p>
-              <p className="flex items-center gap-2.5 text-sm text-slate-500">
-                <Phone size={14} className="text-slate-300 flex-shrink-0" />
+              <p className="flex items-center gap-2.5 text-sm text-(--color-muted)">
+                <Phone size={14} className="text-(--color-muted) shrink-0" />
                 {student.phone}
               </p>
             </div>
           </div>
 
           {/* Program interest */}
-          <div className="rounded-2xl border border-slate-100 bg-white p-5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">
+          <div className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-(--color-muted) mb-3">
               Program interest
             </p>
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-violet-700">
                 {student.preferredCourse}
               </span>
-              <span className="inline-flex items-center rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+              <span className="inline-flex items-center rounded-full bg-(--color-surface-muted) px-3 py-1 text-xs font-medium text-(--color-text)">
                 {student.preferredCountry}
               </span>
             </div>
@@ -403,15 +403,15 @@ export default function StudentProfilePage() {
 
           {/* ── APPLICATIONS ── */}
           {activeTab === "Applications" && (
-            <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
+            <div className="overflow-hidden rounded-2xl border border-(--color-border) bg-(--color-surface)">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100">
+                  <tr className="border-b border-(--color-border)">
                     {["Institution", "Course", "Intake", "Status", "Date"].map(
                       (h) => (
                         <th
                           key={h}
-                          className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-slate-400"
+                          className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-(--color-muted)"
                         >
                           {h}
                         </th>
@@ -423,21 +423,21 @@ export default function StudentProfilePage() {
                   {profile?.applications?.map((app) => (
                     <tr
                       key={app.id}
-                      className="border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
+                      className="border-b border-(--color-border) last:border-none hover:bg-(--color-surface-muted) transition-colors"
                     >
-                      <td className="px-4 py-3 font-medium text-slate-800">
+                      <td className="px-4 py-3 font-medium text-(--color-text)">
                         {app.institutions?.name}
                       </td>
-                      <td className="px-4 py-3 text-slate-500">
+                      <td className="px-4 py-3 text-(--color-muted)">
                         {app.courses?.name}
                       </td>
-                      <td className="px-4 py-3 text-slate-500">
+                      <td className="px-4 py-3 text-(--color-muted)">
                         {app.intake || "—"}
                       </td>
                       <td className="px-4 py-3">
                         <StatusBadge status={app.status} />
                       </td>
-                      <td className="px-4 py-3 text-slate-400">
+                      <td className="px-4 py-3 text-(--color-muted)">
                         {formatDate(app.created_at)}
                       </td>
                     </tr>
@@ -453,20 +453,20 @@ export default function StudentProfilePage() {
               {profile?.documents?.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 hover:border-slate-200 transition-colors"
+                  className="flex items-center gap-3 rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-3 hover:border-(--color-border) transition-colors"
                 >
                   <DocIcon type={doc.document_type} />
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-800">
+                    <p className="text-sm font-medium text-(--color-text)">
                       {doc.document_type}
                     </p>
-                    <p className="text-xs text-slate-400 truncate">
+                    <p className="text-xs text-(--color-muted) truncate">
                       {doc.file_name || "No file name"}
                     </p>
                   </div>
 
-                  <span className="shrink-0 text-xs text-slate-300 mr-2">
+                  <span className="shrink-0 text-xs text-(--color-muted) mr-2">
                     {formatDate(doc.created_at)}
                   </span>
 
@@ -475,12 +475,12 @@ export default function StudentProfilePage() {
                       setViewingDoc({
                         ...doc,
                         file_url: `${
-                          import.meta.env.VITE_API_URL?.replace("/api", "") || 
+                          import.meta.env.VITE_API_URL?.replace("/api", "") ||
                           "http://localhost:5000"
                         }/${doc.file_url.replace(/\\/g, "/")}`,
                       })
                     }
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 transition-colors"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 py-1.5 text-xs font-medium text-(--color-text) hover:border-violet-200 hover:bg-violet-50 hover:text-violet-700 transition-colors"
                   >
                     <Eye size={13} />
                     View
@@ -498,19 +498,19 @@ export default function StudentProfilePage() {
                   <div className="flex flex-col items-center">
                     <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-violet-500" />
                     {i < profile.timeline.length - 1 && (
-                      <div className="mt-1 flex-1 w-px bg-slate-100" />
+                      <div className="mt-1 flex-1 w-px bg-(--color-surface-muted)" />
                     )}
                   </div>
                   <div className="pb-6">
-                    <p className="text-sm font-medium text-slate-800">
+                    <p className="text-sm font-medium text-(--color-text)">
                       {item.description}
                     </p>
-                    <p className="mt-0.5 text-xs text-slate-400">
+                    <p className="mt-0.5 text-xs text-(--color-muted)">
                       {[item.users?.first_name, item.users?.last_name]
                         .filter(Boolean)
                         .join(" ") || "System"}
                     </p>
-                    <p className="mt-0.5 text-xs text-slate-300">
+                    <p className="mt-0.5 text-xs text-(--color-muted)">
                       {formatDate(item.created_at)}
                     </p>
                   </div>
