@@ -1,18 +1,28 @@
 import api from "../services/axios";
 
-const unwrapData = (response) => response.data?.data ?? response.data;
-
-export const getUnreadCount = async () => {
-  const response = await api.get("/notifications/unread-count");
-  const data = unwrapData(response);
-  const count = Number(data?.count);
-
-  return Number.isFinite(count) ? count : 0;
-};
+const unwarpData = (response) => 
+  response.data?.data ?? response.data;
 
 export const getNotifications = async () => {
   const response = await api.get("/notifications");
-  const data = unwrapData(response);
-
-  return Array.isArray(data) ? data : [];
+  return unwarpData(response);
 };
+
+export const getUnreadCount = async () => {
+  const response = await api.get("/notifications/unread-count");
+  return response.data.count;
+};
+
+export const markAsRead = async (id) => {
+  const response = await api.put(`/notifications/${id}/read`
+  );
+
+  return unwarpData(response);
+};
+
+export const markAllAsRead = async () => {
+  const response = await api.put(
+    "/notifications/read-all"
+  );
+  return unwarpData(response);
+}
