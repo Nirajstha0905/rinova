@@ -44,6 +44,15 @@ export const uploadDocument = async (req, res) => {
       action: "upload",
       description: `${doc_type} uploaded`,
     });
+    await createNotification({
+      user_id: documentationOfficer.id,
+      title: "Document Uploaded",
+      message: `${document.file_name} uploaded.`,
+      type: "document",
+      entity_id: document.id,
+      entity_type: "document",
+      action_url: "/documents",
+    });
   } catch (error) {
     console.error("upload Error: ", error);
 
