@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import * as notificationApi from "../../api/notificationApi";
 import { useAuth } from "../../context/AuthContext";
 import ThemeToggle from "../theme/ThemeToggle";
+import NotificationPanel from "../../pages/notifications/NotificationPanel";
 
 const getRoleColor = (role) => {
   const colors = {
@@ -181,52 +182,10 @@ export default function Navbar({ onMenuClick }) {
           )}
         </div>
       </div>
-      {openNotifications && (
-  <div className="absolute right-4 top-16 w-96 max-h-105 overflow-hidden rounded-xl border bg-white shadow-xl z-50 flex flex-col">
-
-    {/* Header */}
-    <div className="flex items-center justify-between px-4 py-3 border-b">
-      <h3 className="font-semibold text-sm">Notifications</h3>
-
-      <button
-        onClick={async () => {
-          await notificationApi.markAllAsRead();
-          setUnreadCount(0);
-          loadNotifications();
-        }}
-        className="text-xs text-blue-600 hover:underline"
-      >
-        Mark all read
-      </button>
-    </div>
-
-    {/* List */}
-    <div className="overflow-y-auto flex-1">
-      {loading ? (
-        <p className="p-4 text-sm text-gray-500">Loading...</p>
-      ) : notifications.length === 0 ? (
-        <p className="p-4 text-sm text-gray-500">No notifications</p>
-      ) : (
-        notifications.map((n) => (
-          <div
-            key={n.id}
-            onClick={async () => {
-              await notificationApi.markAsRead(n.id);
-              loadNotifications();
-              setUnreadCount((c) => Math.max(c - 1, 0));
-            }}
-            className={`px-4 py-3 border-b cursor-pointer hover:bg-gray-50 ${
-              !n.is_read ? "bg-blue-50" : ""
-            }`}
-          >
-            <p className="text-sm font-medium">{n.title}</p>
-            <p className="text-xs text-gray-500">{n.message}</p>
-          </div>
-        ))
-      )}
-    </div>
-  </div>
-)}
+      <NotificationPanel
+        open={openNotifications}
+        onClose={() => setOpenNotifications(false)}
+      />
     </header>
   );
 }

@@ -19,6 +19,8 @@ const getActionStyle = (action = "") => {
 
   if (normalized.includes("delete"))
     return "bg-red-100 text-red-700";
+  if(normalized.includes("reject"))
+    return "bg-orange-100 text-orange-700";
 
   return "bg-slate-100 text-slate-700";
 };
@@ -36,7 +38,7 @@ const getActionStyle = (action = "") => {
         <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
           {activities.map((activity) => (
             <div key={activity.id} className="flex items-start gap-4 pb-4 border-b border-[#edf1f8] last:border-b-0">
-              <div className="w-2.5 h-2.5 bg-gradient-to-br from-[#2558ff] to-[#9b3bff] rounded-full mt-2 flex-shrink-0"></div>
+              <div className="w-2.5 h-2.5 bg-linear-to-br from-[#2558ff] to-[#9b3bff] rounded-full mt-2 flex-shrink-0"></div>
               <div className="flex-1 min-w-0">
                 <div className=" flex items-start justify-between gap-4">
                 <p className="font-semibold text-sm text-slate-950">
