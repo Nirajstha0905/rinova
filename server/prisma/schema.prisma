@@ -211,6 +211,7 @@ model tasks {
   deleted_at      DateTime?      @db.Timestamp(6)
   organization_id String?        @db.Uuid
   priority        String?        @db.VarChar(50)
+  category        String?        @db.VarChar(50)
   applications    applications?  @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   users           users?         @relation(fields: [assigned_to], references: [id], onDelete: NoAction, onUpdate: NoAction)
   leads           leads?         @relation(fields: [lead_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
