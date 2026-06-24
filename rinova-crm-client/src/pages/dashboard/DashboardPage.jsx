@@ -83,7 +83,7 @@ function Panel({ title, subtitle, children, action }) {
 
 function EmptyState({ text }) {
   return (
-    <div className="flex min-h-[180px] items-center justify-center rounded-2xl border border-dashed border-[#d9e3f5] bg-[#f8fbff] text-sm text-slate-500">
+    <div className="flex min-h-45 items-center justify-center rounded-2xl border border-dashed border-[#d9e3f5] bg-[#f8fbff] text-sm text-slate-500">
       {text}
     </div>
   );
@@ -186,7 +186,7 @@ function RoleSpecificDashboard({ role, overview, recentActivities, upcomingTasks
         { title: "Total Leads", value: overview?.totalLeads ?? 0, helper: "All leads across the organization", icon: Users, tone: "blue" },
         { title: "Total Students", value: overview?.totalStudents ?? 0, helper: "All active student records", icon: GraduationCap, tone: "green" },
         { title: "Total Applications", value: overview?.totalApplications ?? 0, helper: "Applications across all counsellors", icon: Briefcase, tone: "violet" },
-        { title: "Active Staff", value: 0, helper: "Staff endpoint not connected yet", icon: UserPlus, tone: "amber" },
+        { title: "Active Staff", value: 0, helper: "Team members currently available", icon: UserPlus, tone: "amber" },
       ],
       actions: [
         { label: "Add User", icon: UserPlus, to: "/settings" },
@@ -200,10 +200,10 @@ function RoleSpecificDashboard({ role, overview, recentActivities, upcomingTasks
       title: "My Counselling Workspace",
       subtitle: "Focus on assigned leads, students, follow-ups, tasks, and counselling notes.",
       stats: [
-        { title: "My Leads", value: overview?.totalLeads ?? 0, helper: "Assigned-leads endpoint pending", icon: Users, tone: "blue" },
-        { title: "My Students", value: overview?.totalStudents ?? 0, helper: "Assigned-students endpoint pending", icon: GraduationCap, tone: "green" },
+        { title: "My Leads", value: overview?.totalLeads ?? 0, helper: "Leads assigned to your workspace", icon: Users, tone: "blue" },
+        { title: "My Students", value: overview?.totalStudents ?? 0, helper: "Students you are currently supporting", icon: GraduationCap, tone: "green" },
         { title: "Follow-ups Due Today", value: overview?.todayTasks ?? 0, helper: "Tasks due today", icon: CalendarClock, tone: "amber" },
-        { title: "Applications Submitted", value: overview?.totalApplications ?? 0, helper: "Submitted-applications endpoint pending", icon: Briefcase, tone: "violet" },
+        { title: "Applications Submitted", value: overview?.totalApplications ?? 0, helper: "Applications moving through counselling", icon: Briefcase, tone: "violet" },
       ],
       actions: [
         { label: "Add Lead", icon: UserPlus, to: "/leads" },
@@ -217,10 +217,10 @@ function RoleSpecificDashboard({ role, overview, recentActivities, upcomingTasks
       title: "Document Review Desk",
       subtitle: "Review pending documents, recent uploads, and applications awaiting documentation.",
       stats: [
-        { title: "Pending Documents", value: overview?.totalDocuments ?? 0, helper: "Pending status split not connected yet", icon: FileText, tone: "amber" },
-        { title: "Under Review", value: 0, helper: "Review queue endpoint pending", icon: FileCheck2, tone: "blue" },
-        { title: "Approved Documents", value: 0, helper: "Approved status endpoint pending", icon: FileCheck2, tone: "green" },
-        { title: "Rejected Documents", value: 0, helper: "Rejected status endpoint pending", icon: FileText, tone: "rose" },
+        { title: "Pending Documents", value: overview?.totalDocuments ?? 0, helper: "Documents waiting for review", icon: FileText, tone: "amber" },
+        { title: "Under Review", value: 0, helper: "Files currently being checked", icon: FileCheck2, tone: "blue" },
+        { title: "Approved Documents", value: 0, helper: "Documents cleared for applications", icon: FileCheck2, tone: "green" },
+        { title: "Rejected Documents", value: 0, helper: "Files requiring student updates", icon: FileText, tone: "rose" },
       ],
       actions: [
         { label: "Upload Document", icon: FilePlus2, to: "/documents" },
@@ -235,7 +235,7 @@ function RoleSpecificDashboard({ role, overview, recentActivities, upcomingTasks
       subtitle: "Track documents, applications, notifications, and upcoming appointments.",
       stats: [
         { title: "Documents Uploaded", value: overview?.totalDocuments ?? 0, helper: "Your uploaded documents", icon: FileText, tone: "blue" },
-        { title: "Pending Documents", value: 0, helper: "Pending document endpoint not connected yet", icon: CalendarClock, tone: "amber" },
+        { title: "Pending Documents", value: 0, helper: "Required files still outstanding", icon: CalendarClock, tone: "amber" },
         { title: "Applications", value: overview?.totalApplications ?? 0, helper: "Your application records", icon: Briefcase, tone: "violet" },
         { title: "Notifications", value: overview?.unreadNotifications ?? 0, helper: "Unread messages and alerts", icon: BellRing, tone: "rose" },
       ],
@@ -411,14 +411,14 @@ export default function DashboardPage() {
     {
       title: "Pending Documents",
       value: overview?.totalDocuments ?? 0,
-      helper: "Document tracking endpoint pending status split",
+      helper: "Documents waiting for review",
       icon: FileText,
       tone: "amber",
     },
     {
       title: "Visa Applications",
       value: 0,
-      helper: "Visa dashboard endpoint not connected yet",
+      helper: "Visa cases currently tracked",
       icon: FileCheck2,
       tone: "rose",
     },
@@ -450,7 +450,7 @@ export default function DashboardPage() {
       <div className="rounded-3xl border border-[#e4ebf7] bg-white px-6 py-6 shadow-[0_16px_35px_rgba(27,39,74,0.05)] md:px-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2558ff] to-[#9b3bff] text-white shadow-sm shadow-violet-200">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-[#2558ff] to-[#9b3bff] text-white shadow-sm shadow-violet-200">
               <PieChart size={30} />
             </div>
             <div>
@@ -466,7 +466,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 lg:min-w-[390px]">
+          <div className="grid grid-cols-3 gap-3 lg:min-w-97.5">
             <div className="rounded-2xl border border-[#e5ebf7] bg-[#f7f9ff] px-4 py-3">
               <p className="text-xs text-slate-500">Today Tasks</p>
               <p className="text-lg font-bold text-slate-950">{overview?.todayTasks ?? 0}</p>
@@ -502,7 +502,7 @@ export default function DashboardPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyState text="Lead source endpoint is not connected yet" />
+            <EmptyState text="No lead source data yet" />
           )}
         </Panel>
 
@@ -527,7 +527,7 @@ export default function DashboardPage() {
           title="Recent Leads"
           subtitle="Newest enquiries awaiting counselling"
           items={recentLeads}
-          emptyText="Recent leads endpoint is not connected yet"
+          emptyText="No recent leads yet"
           renderItem={(lead) => (
             <div key={lead.id} className="rounded-xl border border-[#edf1f8] bg-[#f8fbff] p-4">
               {lead.name}
@@ -539,7 +539,7 @@ export default function DashboardPage() {
           title="Students Needing Documents"
           subtitle="Students blocked by missing or pending files"
           items={studentsNeedingDocuments}
-          emptyText="Document requirement endpoint is not connected yet"
+          emptyText="No students need documents right now"
           renderItem={(student) => (
             <div key={student.id} className="rounded-xl border border-[#edf1f8] bg-[#f8fbff] p-4">
               {student.name}

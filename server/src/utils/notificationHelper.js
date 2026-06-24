@@ -1,21 +1,28 @@
 import prisma from "../config/db.js";
 
-export  const  createNotification = async ({
-    user_id,
-    title,
-    message,
+export const createNotification = async ({
+  user_id,
+  title,
+  message,
+  type = "info",
+  action_url = null,
+  entity_id = null,
+  entity_type = null,
 }) => {
-    try{
-        await prisma.notifications.create({
-            data: {
-                user_id,
-                title,
-                message,
-            },
-        });
-    }
-    catch(error){
-        console.error("Notificatio error: ", error);
-        
-    }
+  try {
+    return await prisma.notifications.create({
+      data: {
+        user_id,
+        title,
+        message,
+        type,
+        action_url,
+        entity_id,
+        entity_type,
+      },
+    });
+  } catch (error) {
+    console.error("Notification error:", error);
+    throw error;
+  }
 };

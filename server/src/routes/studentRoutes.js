@@ -17,8 +17,8 @@ router.get('/', getStudent);
 router.get("/:id/profile", getStudentProfile);
 router.get("/:id", getStudentById);
 router.post('/', protect, createStudent);
-router.put('/:id', updateStudent);
-router.delete('/:id', deleteStudent);
+router.put('/:id', protect, updateStudent);
+router.delete('/:id', protect, deleteStudent);
 
 
 

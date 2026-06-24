@@ -11,14 +11,18 @@ const toNullableDate = (value) => {
 };
 export const getStudent = async (req, res) => {
   try {
-    const {search} = req.query;
+    const { search } = req.query;
     const students = await prisma.students.findMany({
       where: {
         deleted_at: null,
         ...(search && {
-          OR:[
+          OR: [
             {
               first_name: {
+                contains: search,
+                mode: "insensitive",
+              },
+              middle_name: {
                 contains: search,
                 mode: "insensitive",
               },
@@ -32,9 +36,9 @@ export const getStudent = async (req, res) => {
                 contains: search,
                 mode: "insensitive",
               },
-            }
-          ]
-        })
+            },
+          ],
+        }),
       },
       orderBy: {
         created_at: "desc",
@@ -129,11 +133,14 @@ export const createStudent = async (req, res) => {
         user_id: req.user?.id,
         title: "Student Added",
         message: `${student.first_name} ${student.last_name} added successfully`,
+        type: "student",
+        entity_id: student.id,
+        entity_type: "student",
+        action_url: `/students/${student.id}`,
       }),
     ]);
 
     return res.status(201).json(student);
-
   } catch (error) {
     console.error(error);
 
@@ -145,31 +152,31 @@ export const createStudent = async (req, res) => {
 
 export const updateStudent = async (req, res) => {
   try {
-    const data = {...req.body};
-    if(data.date_of_birth){
+    const data = { ...req.body };
+    if (data.date_of_birth) {
       data.date_of_birth = new Date(data.date_of_birth);
     }
     const student = await prisma.students.update({
       where: {
         id: req.params.id,
       },
-      data: req.body,
+      data,
     });
 
     //--------------Activity Logger--------------//
-    await logActivity({
-  user_id: req.user?.id,
-  student_id: student.id,
-  entity_type: "student",
-  entity_id: student.id,
-  action: "update",
-  description: `Student ${student.first_name} ${student.last_name} updated`,
-});
 
+    await logActivity({
+      user_id: req.user?.id,
+      student_id: student.id,
+      entity_type: "student",
+      entity_id: student.id,
+      action: "update",
+      description: `Student ${student.first_name} ${student.last_name} updated`,
+    });
 
     res.status(200).json(student);
   } catch (error) {
-        if (error.code === "P2025") {
+    if (error.code === "P2025") {
       return res.status(404).json({
         message: "Student not found",
       });
@@ -195,17 +202,26 @@ export const deleteStudent = async (req, res) => {
       },
     });
     //--------------ACTIVITY LOGGER----------//
-      await logActivity({
-  user_id: req.user?.id,
-  student_id: student.id,
-  entity_type: "student",
-  entity_id: student.id,
-  action: "delete",
-  description: `Student ${student.first_name} ${student.last_name} archived`,
-});
-    res.status(200).json({
-      message: "Student deleted successfully",
+    await logActivity({
+      user_id: req.user?.id,
+      student_id: student.id,
+      entity_type: "student",
+      entity_id: student.id,
+      action: "delete",
+      description: `Student ${student.first_name} ${student.last_name} archived`,
     });
+    (createNotification({
+      user_id: req.user?.id,
+      title: "Student deleted",
+      message: `${student.first_name} ${student.last_name} deleted successfully`,
+      type: "student",
+      entity_id: student.id,
+      entity_type: "student",
+      action_url: `/students/${student.id}`,
+    }),
+      res.status(200).json({
+        message: "Student deleted successfully",
+      }));
   } catch (error) {
     if (error.code === "P2025") {
       return res.status(404).json({
@@ -220,4 +236,3 @@ export const deleteStudent = async (req, res) => {
     });
   }
 };
-

@@ -22,12 +22,14 @@ const normalizeStudent = (student) => ({
   lastName: asText(student?.last_name, ""),
   email: asText(student?.email),
   phone: asText(student?.phone),
+  dob: student?.date_of_birth ?? null,
   preferredCourse: asText(student?.preferred_course),
   preferredCountry: asText(student?.preferred_country),
   nationality: asText(student?.nationality),
   status: asText(student?.status, "pending"),
   gender: asText(student?.gender),
   passportNumber: asText(student?.passport_number),
+  passportExpiry: student?.passport_expiry ?? null,
   createdAt: student?.created_at ?? null,
 });
 

@@ -1,6 +1,8 @@
 import prisma from "../config/db.js";
 import { logActivity } from "../utils/activityLogger.js";
-import { createNotification }from "../utils/notificationHelper.js";
+import { createNotification } from "../utils/notificationHelper.js";
+
+const buildName = (...parts) => parts.filter(Boolean).join(" ").trim();
 
 export const getTasks = async (req, res) => {
   try {
@@ -17,8 +19,41 @@ export const getTasks = async (req, res) => {
         due_date: "asc",
       },
     });
+    const formatted = tasks.map((t) => ({
+      id: t.id,
+      title: t.title,
+      description: t.description,
+      priority: t.priority,
+      category: t.category,
+      status: t.status,
+      dueDate: t.due_date,
+      createdAt: t.created_at,
 
-    res.status(200).json(tasks);
+      assignedTo: t.users
+        ? {
+            id: t.users.id,
+            name:
+              buildName(t.users.first_name, t.users.last_name) ||
+              t.users.email ||
+              "Assigned user",
+          }
+        : null,
+
+      relatedTo:
+        buildName(
+          t.students?.first_name,
+          t.students?.middle_name,
+          t.students?.last_name,
+        ) ||
+        t.students?.email ||
+        buildName(t.leads?.first_name, t.leads?.middle_name, t.leads?.last_name) ||
+        t.leads?.email ||
+        "Internal",
+
+      tags: [],
+    }));
+
+    res.status(200).json(formatted);
   } catch (error) {
     console.error(error);
 
@@ -68,6 +103,7 @@ export const createTask = async (req, res) => {
       application_id,
       due_date,
       priority,
+      category,
     } = req.body;
 
     if (!title) {
@@ -86,13 +122,20 @@ export const createTask = async (req, res) => {
         application_id,
         due_date: due_date ? new Date(due_date) : null,
         priority,
+        category,
       },
     });
-    await createNotification({
-      user_id: assigned_to,
-      title: "New Task Assigned",
-      message: `Task "${title}" has been assigned to you`,
-    });
+    if (task.assigned_to) {
+      await createNotification({
+        user_id: task.assigned_to,
+        title: "Task Due Soon",
+        message: task.title,
+        type: "task",
+        entity_id: task.id,
+        entity_type: "task",
+        action_url: "/tasks",
+      });
+    }
 
     await logActivity({
       user_id: req.user?.id,
@@ -206,4 +249,3 @@ export const completeTask = async (req, res) => {
     });
   }
 };
-
