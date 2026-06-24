@@ -1,5 +1,5 @@
 import { RotateCcw } from "lucide-react";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../hooks/useTheme";
 import { defaultThemeTokens } from "../../config/theme";
 import "../../index.css";
 
@@ -21,7 +21,6 @@ const fontOptions = [
   "Arial, sans-serif",
   "system-ui, sans-serif",
   "Georgia, serif",
-  "Poppins, sans-serif"
 ];
 
 export default function ThemeSettingsPanel() {

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import {
   applyThemeTokens,
   darkThemeTokens,
@@ -73,12 +73,4 @@ export function ThemeProvider({ children }) {
   );
 }
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-
-  if (!context) {
-    throw new Error("useTheme must be used inside ThemeProvider");
-  }
-
-  return context;
-};
+export { ThemeContext };
