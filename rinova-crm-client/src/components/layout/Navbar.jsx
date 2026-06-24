@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import * as notificationApi from "../../api/notificationApi";
 import { useAuth } from "../../context/AuthContext";
 import ThemeToggle from "../theme/ThemeToggle";
-import NotificationPanel from "../../pages/notifications/NotificationPanel";
+import NotificationPanel from "../notifications/NotificationPanel";
 
 const getRoleColor = (role) => {
   const colors = {
@@ -48,42 +48,10 @@ export default function Navbar({ onMenuClick }) {
     };
   }, []);
 
-  //---------------------------------NOTIFICATION------------------------------//
   const [openNotifications, setOpenNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const loadNotifications = async () => {
-    try {
-      setLoading(true);
-      const data = await notificationApi.getNotifications();
-      setNotifications(data);
-    } catch {
-      toast.error("Failed to load notifications");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const loadUnread = async () => {
-      try {
-        const count = await notificationApi.getUnreadCount();
-        setUnreadCount(count);
-      } catch {
-        setUnreadCount(0);
-      }
-    };
-
-    loadUnread();
-  }, []);
 
   const toggleNotifications = () => {
-    setOpenNotifications((prev) => {
-      const next = !prev;
-      if (next) loadNotifications();
-      return next;
-    });
+    setOpenNotifications((prev) => !prev);
   };
 
   const handleLogout = async () => {
@@ -185,6 +153,7 @@ export default function Navbar({ onMenuClick }) {
       <NotificationPanel
         open={openNotifications}
         onClose={() => setOpenNotifications(false)}
+        onUnreadChange={setUnreadCount}
       />
     </header>
   );
