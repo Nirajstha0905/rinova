@@ -85,12 +85,6 @@ const getStatusConfig = (doc) => {
   }
 };
 
-const statusStyles = {
-  verified: "border-emerald-100 bg-emerald-50 text-emerald-700",
-  pending: "border-amber-100 bg-amber-50 text-amber-700",
-  rejected: "border-rose-100 bg-rose-50 text-rose-700",
-};
-
 function StatCard({ title, value, helper, icon: Icon, tone }) {
   const tones = {
     violet: "bg-[#f2f0ff] text-[#6d35ff]",
