@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import toast from "react-hot-toast";
 import {
   CalendarClock,
+  User,
+  Dot,
   CheckCircle2,
   ClipboardCheck,
   Circle,
@@ -65,6 +67,158 @@ const statusTone = {
   done: "green",
 };
 
+const SelectDropdown = ({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+  error,
+  renderOption,
+  renderSelected,
+  direction = "down",
+}) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const containerRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const filtered = options.filter((o) =>
+    (o.label ?? o).toLowerCase().includes(query.toLowerCase()),
+  );
+
+  // close on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+        setQuery("");
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // focus search input when opened
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
+
+  const handleSelect = (opt) => {
+    onChange(opt.value ?? opt);
+    setOpen(false);
+    setQuery("");
+  };
+
+  const displayValue = value
+    ? renderSelected
+      ? renderSelected(options.find((o) => (o.value ?? o) === value))
+      : (options.find((o) => (o.value ?? o) === value)?.label ?? value)
+    : null;
+
+  return (
+    <div className="relative space-y-1" ref={containerRef}>
+      {label && (
+        <label className="text-sm font-medium text-(--color-text)">
+          {label}
+        </label>
+      )}
+
+      {/* trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((p) => !p)}
+        className={`
+          w-full rounded-xl border bg-(--color-surface) px-4 py-2.5 text-left
+          text-(--color-text) shadow-sm outline-none transition flex items-center justify-between
+          hover:border-(--color-border)
+          ${open ? "border-indigo-500 ring-4 ring-indigo-100" : "border-(--color-border)"}
+          ${error ? "border-red-400" : ""}
+        `}
+      >
+        <span
+          className={
+            displayValue ? "text-(--color-text)" : "text-(--color-muted)"
+          }
+        >
+          {displayValue ?? placeholder ?? "Select…"}
+        </span>
+        <svg
+          className={`w-4 h-4 text-(--color-muted) transition-transform ${open ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      {/* dropdown panel */}
+      {open && (
+        <div
+          className={`absolute z-9999 w-full rounded-xl border border-(--color-border) bg-(--color-surface) shadow-xl overflow-hidden ${
+            direction === "up" ? "bottom-full mb-1" : "top-full mt-1"
+          }`}
+        >
+          {/* options list */}
+          <ul className="max-h-52 overflow-y-auto py-1">
+            {filtered.length === 0 ? (
+              <li className="px-4 py-2 text-sm text-(--color-muted)">
+                No results
+              </li>
+            ) : (
+              filtered.map((opt) => {
+                const val = opt.value ?? opt;
+                const isSelected = val === value;
+                return (
+                  <li
+                    key={val}
+                    onMouseDown={() => handleSelect(opt)}
+                    className={`
+                      flex items-center gap-2 px-4 py-2 text-sm cursor-pointer transition
+                      ${
+                        isSelected
+                          ? "bg-indigo-50 text-indigo-700 font-medium"
+                          : "text-(--color-text) hover:bg-(--color-surface-muted)"
+                      }
+                    `}
+                  >
+                    {renderOption ? renderOption(opt) : (opt.label ?? opt)}
+                    {isSelected && (
+                      <svg
+                        className="ml-auto w-3.5 h-3.5 text-indigo-500 shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    )}
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        </div>
+      )}
+
+      {error && (
+        <p className="text-xs text-red-500 font-medium">{error.message}</p>
+      )}
+    </div>
+  );
+};
+
 const formatLabel = (value = "") =>
   value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 
@@ -87,7 +241,14 @@ const isDueSoon = (value, status) => {
   return diffDays <= 2;
 };
 
-function StatusActionButton({ children, active, onClick }) {
+function StatusActionButton({ children, status, active, onClick }) {
+  const toneMap = {
+    todo: "bg-slate-500",
+    in_progress: "bg-blue-500",
+    review: "bg-violet-500",
+    completed: "bg-green-500",
+    done: "bg-green-500",
+  };
   return (
     <button
       type="button"
@@ -95,8 +256,8 @@ function StatusActionButton({ children, active, onClick }) {
       disabled={active}
       className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition ${
         active
-          ? "bg-(--color-primary) text-white"
-          : "bg-(--color-surface-muted) text-(--color-muted) hover:text-(--color-text)"
+          ? `${toneMap[status]} text-white`
+          : `bg-(--color-surface-muted) text-(--color-muted) hover:text-(--color-text)`
       }`}
     >
       {children}
@@ -116,34 +277,64 @@ function TaskCard({
 
   return (
     <Card
-      className="transition hover:-translate-y-0.5 hover:border-(--color-primary)/40"
+      className={`transition-all duration-200 hover:-translate-y-1 hover:border-(--color-primary)/40 ${
+        draggable ? "cursor-grap active:cursor-grabbing" : ""
+      }`}
       draggable={draggable}
-      onDragStart={onDragStart}
+      onDragStart={(e) => {
+        e.currentTarget.classList.add("opacity-50", "rotate-1");
+        onDragStart?.();
+      }}
+      onDragEnd={(e) => {
+        e.currentTarget.classList.remove("opacity-50", "rotate-1");
+      }}
     >
       <CardContent className="space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="font-semibold text-(--color-text)">{task.title}</h3>
+            {compact ? (
+              <>
+                <h3 className="font-semibold text-(--color-text)">
+                  {task.title}
+                </h3>
+
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  <Badge tone={priorityTone[task.priority] || "blue"}>
+                    {formatLabel(task.priority)}
+                  </Badge>
+
+                  <Badge tone="violet">{formatLabel(task.category)}</Badge>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-(--color-text)">
+                  {task.title}
+                </h3>
+
+                <Badge tone={priorityTone[task.priority] || "blue"}>
+                  <Dot strokeWidth={6} />
+                  {formatLabel(task.priority)}
+                </Badge>
+
+                <Badge tone="violet">{formatLabel(task.category)}</Badge>
+              </div>
+            )}
+
             <p className="mt-1 line-clamp-2 text-sm text-(--color-muted)">
               {task.description}
             </p>
           </div>
-          <Badge tone={statusTone[task.status] || "slate"}>
-            {formatLabel(task.status)}
-          </Badge>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs text-(--color-muted)">
-          <Badge tone={priorityTone[task.priority] || "blue"}>
-            {formatLabel(task.priority)}
-          </Badge>
-          <Badge tone="violet">{formatLabel(task.category)}</Badge>
           <span className="inline-flex items-center gap-1">
             <CalendarClock size={14} />
             <span className={dueSoon ? "font-semibold text-rose-600" : ""}>
-              {formatDate(task.dueDate)}
+              {dueSoon ? "Overdue" : "Due"}: {formatDate(task.dueDate)}
             </span>
           </span>
+          <User size={16} />
           <span>{task.relatedTo}</span>
         </div>
 
@@ -156,24 +347,28 @@ function TaskCard({
           {!compact && (
             <div className="flex flex-wrap items-center gap-2">
               <StatusActionButton
+                status="todo"
                 active={task.status === "todo"}
                 onClick={() => onStatusChange(task.id, "todo")}
               >
                 To Do
               </StatusActionButton>
               <StatusActionButton
+                status="in_progress"
                 active={task.status === "in_progress"}
                 onClick={() => onStatusChange(task.id, "in_progress")}
               >
                 Progress
               </StatusActionButton>
               <StatusActionButton
+                status="review"
                 active={task.status === "review"}
                 onClick={() => onStatusChange(task.id, "review")}
               >
                 Review
               </StatusActionButton>
               <StatusActionButton
+                status="completed"
                 active={["done", "completed"].includes(task.status)}
                 onClick={() => onStatusChange(task.id, "completed")}
               >
@@ -268,7 +463,7 @@ function CreateTaskModal({ open, onClose, onCreate, users, students, leads }) {
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               placeholder="e.g. Follow up missing SOP"
-              className="mt-2"
+              className="mt-2 bg-(--color-surface)"
             />
           </label>
 
@@ -289,52 +484,54 @@ function CreateTaskModal({ open, onClose, onCreate, users, students, leads }) {
               <span className="text-sm font-semibold text-(--color-text)">
                 Priority
               </span>
-              <Select
+              <SelectDropdown
+                label=""
                 value={priority}
-                onChange={(event) => setPriority(event.target.value)}
-                className="mt-2 w-full"
-              >
-                <option value="low">Low</option>
-                <option value="normal">Normal</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
-              </Select>
+                onChange={setPriority}
+                options={[
+                  { value: "low", label: "Low" },
+                  { value: "normal", label: "Normal" },
+                  { value: "medium", label: "Medium" },
+                  { value: "high", label: "High" },
+                  { value: "urgent", label: "Urgent" },
+                ]}
+              />
             </label>
 
             <label className="block">
               <span className="text-sm font-semibold text-(--color-text)">
                 Category
               </span>
-              <Select
+              <SelectDropdown
+                label=""
                 value={category}
-                onChange={(event) => setCategory(event.target.value)}
-                className="mt-2 w-full"
-              >
-                {taskCategories.map((option) => (
-                  <option key={option} value={option}>
-                    {formatLabel(option)}
-                  </option>
-                ))}
-              </Select>
+                onChange={setCategory}
+                options={taskCategories.map((cat) => ({
+                  value: cat,
+                  label: formatLabel(cat),
+                }))}
+                placeholder="Select category"
+              />
             </label>
 
             <label className="block">
               <span className="text-sm font-semibold text-(--color-text)">
                 Assign to
               </span>
-              <Select
+              <SelectDropdown
+                label=""
+                direction="up"
                 value={assignedTo}
-                onChange={(event) => setAssignedTo(event.target.value)}
-                className="mt-2 w-full"
-              >
-                <option value="">Unassigned</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </Select>
+                onChange={setAssignedTo}
+                options={[
+                  { value: "", label: "Unassigned" },
+                  ...users.map((user) => ({
+                    value: user.id,
+                    label: user.name,
+                  })),
+                ]}
+                placeholder="Select user"
+              />
             </label>
 
             <label className="block">
@@ -355,35 +552,44 @@ function CreateTaskModal({ open, onClose, onCreate, users, students, leads }) {
               <span className="text-sm font-semibold text-(--color-text)">
                 Related to
               </span>
-              <Select
+              <SelectDropdown
+                label=""
+                direction="up"
                 value={relatedType}
-                onChange={(event) => {
-                  setRelatedType(event.target.value);
+                onChange={(value) => {
+                  setRelatedType(value);
                   setRelatedId("");
                 }}
-                className="mt-2 w-full"
-              >
-                <option value="student">Student</option>
-                <option value="lead">Lead</option>
-              </Select>
+                options={[
+                  { value: "student", label: "Student" },
+                  { value: "lead", label: "Lead" },
+                  { value: "staff", label: "Staff" },
+                ]}
+                placeholder="Select type"
+              />
             </label>
 
             <label className="block">
               <span className="text-sm font-semibold text-(--color-text)">
                 {relatedType === "student" ? "Student" : "Lead"}
               </span>
-              <Select
+              <SelectDropdown
+                label=""
+                direction="up"
                 value={relatedId}
-                onChange={(event) => setRelatedId(event.target.value)}
-                className="mt-2 w-full"
-              >
-                <option value="">No related record</option>
-                {relatedOptions.map((record) => (
-                  <option key={record.id} value={record.id}>
-                    {record.name}
-                  </option>
-                ))}
-              </Select>
+                onChange={setRelatedId}
+                options={[
+                  {
+                    value: "",
+                    label: "No related record",
+                  },
+                  ...relatedOptions.map((record) => ({
+                    value: record.id,
+                    label: record.name,
+                  })),
+                ]}
+                placeholder={`Select ${relatedType}`}
+              />
             </label>
           </div>
         </div>
@@ -414,7 +620,6 @@ export default function TaskPage() {
   const [leads, setLeads] = useState([]);
   const [draggingTaskId, setDraggingTaskId] = useState("");
   const [activeColumn, setActiveColumn] = useState(null);
-
   const loadTasks = async () => {
     try {
       setLoading(true);
@@ -478,7 +683,9 @@ export default function TaskPage() {
 
   const handleCreate = async (payload) => {
     try {
-      await taskApi.createTask(payload);
+      const newTask = await taskApi.createTask(payload);
+
+      setTasks((prev) => [newTask, ...prev]);
       toast.success("Task created");
       await loadTasks();
     } catch (error) {
@@ -487,10 +694,16 @@ export default function TaskPage() {
   };
 
   const handleStatusChange = async (id, nextStatus) => {
+    const previousTasks = [...tasks];
+
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, status: nextStatus } : task,
+      ),
+    );
     try {
       await taskApi.updateTask(id, { status: nextStatus });
       toast.success("Task status updated");
-      await loadTasks();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update task");
     }
@@ -508,11 +721,14 @@ export default function TaskPage() {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this task?")) return;
+
+    const previousTasks = [...tasks];
+    setTasks((prev) => prev.filter((task) => task.id !== id));
     try {
       await taskApi.deleteTask(id);
       toast.success("Task deleted");
-      await loadTasks();
     } catch (error) {
+      setTasks(previousTasks);
       toast.error(error.response?.data?.message || "Failed to delete task");
     }
   };
@@ -618,11 +834,16 @@ export default function TaskPage() {
             {columns.slice(0, 4).map((column) => (
               <Card
                 key={column.key}
-                className="min-h-96"
+                className={`min-h-96 transition-all duration-200 ${
+                  activeColumn === column.key
+                    ? "scale-[1.02] border-(--color-primary) shadow-xl"
+                    : ""
+                }`}
                 onDragOver={(event) => {
                   event.preventDefault();
                   setActiveColumn(column.key);
                 }}
+                onDragLeave={() => setActiveColumn(null)}
                 onDrop={() => handleDropOnColumn(column.key)}
               >
                 <CardHeader
