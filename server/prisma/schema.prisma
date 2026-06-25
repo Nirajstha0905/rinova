@@ -61,21 +61,22 @@ model courses {
 }
 
 model documents {
-  id                  String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  student_id          String?       @db.Uuid
-  application_id      String?       @db.Uuid
-  file_name           String?       @db.VarChar(255)
+  id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id          String?            @db.Uuid
+  application_id      String?            @db.Uuid
+  file_name           String?            @db.VarChar(255)
   file_url            String
-  doc_type            String?       @db.VarChar(100)
-  uploaded_by         String?       @db.Uuid
-  created_at          DateTime?     @default(now()) @db.Timestamp(6)
-  deleted_at          DateTime?     @db.Timestamp(6)
+  doc_type            String?            @db.VarChar(100)
+  uploaded_by         String?            @db.Uuid
+  created_at          DateTime?          @default(now()) @db.Timestamp(6)
+  deleted_at          DateTime?          @db.Timestamp(6)
   file_size           Int?
   rejection_reason    String?
-  verification_status String?       @db.VarChar(50)
-  applications        applications? @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  students            students?     @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users               users?        @relation(fields: [uploaded_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  verification_status String?            @db.VarChar(50)
+  academic_records    academic_records[]
+  applications        applications?      @relation(fields: [application_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  students            students?          @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users               users?             @relation(fields: [uploaded_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model institutions {
@@ -113,7 +114,7 @@ model leads {
   status           String?          @default("new") @db.VarChar(50)
   assigned_to      String?          @db.Uuid
   source           String?          @db.VarChar(100)
-  notes_text       String?          @db.Text @map("notes")
+  notes_text       String?          @db.Text@map("notes")
   created_at       DateTime?        @default(now()) @db.Timestamp(6)
   updated_at       DateTime?        @default(now()) @db.Timestamp(6)
   deleted_at       DateTime?        @db.Timestamp(6)
@@ -249,16 +250,38 @@ model users {
 }
 
 model academic_records {
-  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  student_id       String?   @db.Uuid
-  qualification    String?   @db.VarChar(255)
-  institution_name String?   @db.VarChar(255)
-  country          String?   @db.VarChar(100)
-  start_year       Int?
-  completion_year  Int?
-  grade            String?   @db.VarChar(100)
-  created_at       DateTime? @default(now()) @db.Timestamp(6)
-  students         students? @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                    String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id            String?    @db.Uuid
+  qualification         String?    @db.VarChar(255)
+  institution_name      String?    @db.VarChar(255)
+  country               String?    @db.VarChar(100)
+  start_year            Int?
+  completion_year       Int?
+  grade                 String?    @db.VarChar(100)
+  created_at            DateTime?  @default(now()) @db.Timestamp(6)
+  document_id           String?    @db.Uuid
+  level                 String?    @db.VarChar(100)
+  school_name           String?    @db.VarChar(255)
+  college_name          String?    @db.VarChar(255)
+  university_name       String?    @db.VarChar(255)
+  affiliated_college    String?    @db.VarChar(255)
+  stream_faculty        String?    @db.VarChar(255)
+  board_university      String?    @db.VarChar(255)
+  degree_program        String?    @db.VarChar(255)
+  major_specialization  String?    @db.VarChar(255)
+  major_subjects        String?
+  thesis_title          String?
+  semester_wise_gpa     String?
+  final_cgpa_percentage String?
+  gpa_percentage        String?    @db.VarChar(50)
+  division_grade        String?    @db.VarChar(50)
+  enrollment_date       DateTime?  @db.Date
+  graduation_date       DateTime?  @db.Date
+  documents             documents? @relation(fields: [document_id], references: [id], onUpdate: NoAction)
+  students              students?  @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([document_id], map: "idx_academic_records_document_id")
+  @@index([student_id], map: "idx_academic_records_student_id")
 }
 
 model activity_logs {
