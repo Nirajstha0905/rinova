@@ -1,11 +1,12 @@
 import { useAuth } from "./context/AuthContext";
 import AppRoutes from "./routes/AppRoutes";
 import LoginPage from "./pages/auth/LoginPage";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -20,10 +21,12 @@ function App() {
 
   return (
     <>
-      <Routes>
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
-        <Route path="/*" element={isAuthenticated ? <AppRoutes /> : <Navigate to="/login" replace />} />
-      </Routes>
+      <div key={location.pathname} className="app-page-enter">
+        <Routes location={location}>
+          <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
+          <Route path="/*" element={isAuthenticated ? <AppRoutes /> : <Navigate to="/login" replace />} />
+        </Routes>
+      </div>
       <Toaster
         position="top-right"
         toastOptions={{

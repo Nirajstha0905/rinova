@@ -33,7 +33,18 @@ export const getStudentProfile = async (req, res)=> {
             prisma.documents.findMany({
                 where :{
                     student_id: studentId,
-                }
+                },
+                include: {
+                    users: {
+                        select: {
+                            id: true,
+                            first_name: true,
+                            middle_name: true,
+                            last_name: true,
+                            email: true,
+                        },
+                    },
+                },
             }),
             prisma.notes.findMany({
                 where:{
@@ -52,6 +63,21 @@ export const getStudentProfile = async (req, res)=> {
             prisma.academic_records.findMany({
                 where: {
                     student_id: studentId,
+                },
+                include: {
+                    documents: {
+                        include: {
+                            users: {
+                                select: {
+                                    id: true,
+                                    first_name: true,
+                                    middle_name: true,
+                                    last_name: true,
+                                    email: true,
+                                },
+                            },
+                        },
+                    },
                 },
             }),
             prisma.work_experiences.findMany({

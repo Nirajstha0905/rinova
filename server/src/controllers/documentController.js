@@ -30,7 +30,7 @@ export const uploadDocument = async (req, res) => {
       ...document,
       file_size: document.file_size ? Number(document.file_size) : null,
     };
-    res.status(201).json(safeDocument);
+
     await createNotification({
       user_id: req.user.id,
       title: "Document Uploaded",
@@ -44,15 +44,8 @@ export const uploadDocument = async (req, res) => {
       action: "upload",
       description: `${doc_type} uploaded`,
     });
-    await createNotification({
-      user_id: documentationOfficer.id,
-      title: "Document Uploaded",
-      message: `${document.file_name} uploaded.`,
-      type: "document",
-      entity_id: document.id,
-      entity_type: "document",
-      action_url: "/documents",
-    });
+
+    res.status(201).json(safeDocument);
   } catch (error) {
     console.error("upload Error: ", error);
 
@@ -70,6 +63,15 @@ export const getDocuments = async (req, res) => {
       },
       include: {
         students: true,
+        users: {
+          select: {
+            id: true,
+            first_name: true,
+            middle_name: true,
+            last_name: true,
+            email: true,
+          },
+        },
       },
 
       orderBy: {
@@ -92,6 +94,17 @@ export const getStudentDocuments = async (req, res) => {
       where: {
         student_id: req.params.studentId,
         deleted_at: null,
+      },
+      include: {
+        users: {
+          select: {
+            id: true,
+            first_name: true,
+            middle_name: true,
+            last_name: true,
+            email: true,
+          },
+        },
       },
     });
 

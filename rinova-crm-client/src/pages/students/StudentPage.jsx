@@ -2,19 +2,16 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
-  ArrowRight,
   GraduationCap,
   Mail,
   Phone,
   Search,
   Users,
   Plus,
-  SquarePen,
   Trash2
 } from "lucide-react";
 import * as studentApi from "../../api/studentApi";
 import CreateStudentDrawer from "./CreateStudentDrawer";
-import EditStudentDrawer from "./EditStudentDrawer";
 
 const getInitials = (name = "Student") =>
   name
@@ -56,8 +53,6 @@ export default function StudentPage() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [showCreateStudent, setShowCreateStudent] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [showEditDrawer, setShowEditDrawer] = useState(false);
 
   const loadStudents = useCallback(async () => {
     try {
@@ -219,31 +214,28 @@ export default function StudentPage() {
               <table className="min-w-full table-fixed divide-y divide-(--color-border)">
                 <thead className="bg-(--color-surface-muted)">
                   <tr>
-                    <th className="w-[22%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
+                    <th className="w-[20%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
                       Student
                     </th>
-                    <th className="w-[22%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
+                    <th className="w-[20%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
                       Contact
                     </th>
-                    <th className="w-[20%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
+                    <th className="w-[18%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
                       Program
                     </th>
                     <th className="w-[12%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
                       Preferred Country
                     </th>
-                    <th className="w-[12%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
+                    <th className="w-[10%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
                       Nationality
                     </th>
-                    <th className="w-[10%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
+                    <th className="w-[8%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
                       Status
                     </th>
-                    <th className="w-[10%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
+                    <th className="w-[8%] px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
                       Joined
                     </th>
-                    <th
-                      colSpan={3}
-                      className="w-[14%] px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-(--color-muted)"
-                    >
+                    <th className="w-[12%] px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-(--color-muted)">
                       Action
                     </th>
                   </tr>
@@ -252,9 +244,18 @@ export default function StudentPage() {
                   {filteredStudents.map((student) => (
                     <tr
                       key={student.id}
-                      className="transition hover:bg-(--color-surface-muted)"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => navigate(`/students/${student.id}`)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          navigate(`/students/${student.id}`);
+                        }
+                      }}
+                      className="cursor-pointer transition hover:bg-(--color-surface-muted) focus:bg-(--color-surface-muted) focus:outline-none"
                     >
-                      <td className="px-5 py-3 " >
+                      <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
                           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br from-[#2558ff] to-[#9b3bff] text-sm font-bold text-white">
                             {getInitials(student.name)}
@@ -300,35 +301,17 @@ export default function StudentPage() {
                       <td className="px-5 py-2 text-sm text-(--color-muted)">
                         {formatDate(student.createdAt)}
                       </td>
-                      <td className="px-5 py-2 text-right">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedStudent(student);
-                            setShowEditDrawer(true);
-                          }}
-                          className="rounded-xl border px-3 py-2 text-sm text-(--color-text) border-(--color-border) transition hover:bg-(--color-primary) hover:text-(--color-surface) "
-                        >
-                          <SquarePen size={20} />
-                        </button>
-                      </td>
                       <td className="px-3 py-2 text-right">
                         <button
-                          onClick={() => handleDelete(student.id)}
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleDelete(student.id);
+                          }}
                           className="inline-flex items-center gap-2 rounded-xl bg-red-500 px-3 py-2 text-sm text-white hover:bg-red-700"
                         >
                           <Trash2 size={15} />
                           Delete
-                        </button>
-                      </td>
-                      <td className="px-5 py-2 text-right">
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/students/${student.id}`)}
-                          className="inline-flex items-center gap-2 rounded-xl bg-[#111827] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#1f2937]"
-                        >
-                          View
-                          <ArrowRight size={15} />
                         </button>
                       </td>
                     </tr>
@@ -342,12 +325,6 @@ export default function StudentPage() {
       <CreateStudentDrawer
         open={showCreateStudent}
         onClose={() => setShowCreateStudent(false)}
-        onSuccess={loadStudents}
-      />
-      <EditStudentDrawer
-        open={showEditDrawer}
-        student={selectedStudent}
-        onClose={() => setShowEditDrawer(false)}
         onSuccess={loadStudents}
       />
     </>

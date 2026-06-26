@@ -14,6 +14,12 @@ const asText = (value, fallback = "Not provided") => {
   return trimmed || fallback;
 };
 
+const buildUserName = (user) =>
+  [user?.first_name, user?.middle_name, user?.last_name]
+    .filter(Boolean)
+    .join(" ")
+    .trim() || user?.full_name || user?.name || user?.email || "Unknown user";
+
 const buildStudentName = (student) =>
   [student?.first_name, student?.middle_name, student?.last_name]
     .filter(Boolean)
@@ -35,7 +41,9 @@ export const normalizeDocument = (document) => ({
   fileUrl: buildFileUrl(document?.file_url),
   rawFileUrl: document?.file_url ?? "",
   docType: asText(document?.doc_type, "General Document"),
-  uploadedBy: document?.uploaded_by ?? "",
+  uploadedById: document?.uploaded_by ?? "",
+  uploadedByName: buildUserName(document?.users),
+  uploadedBy: buildUserName(document?.users),
   uploadedAt: document?.created_at ?? null,
   fileSize: Number(document?.file_size ?? 0),
   status: asText(document?.verification_status, "pending").toLowerCase(),

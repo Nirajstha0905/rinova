@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { usePresenceTransition } from "../ui/usePresenceTransition";
 
 const menus = [
   {
@@ -157,21 +158,23 @@ function SidebarContent({ onNavigate }) {
 }
 
 export default function Sidebar({ mobileOpen = false, onMobileClose }) {
+  const { shouldRender, visible } = usePresenceTransition(mobileOpen);
+
   return (
     <>
       <aside className="app-surface fixed left-0 top-0 hidden h-screen w-64 flex-col border-r md:flex">
         <SidebarContent />
       </aside>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+      {shouldRender && (
+        <div className={`fixed inset-0 z-50 md:hidden transition-opacity duration-200 ease-[var(--motion-ease)] ${visible ? "opacity-100" : "opacity-0"}`}>
           <button
             type="button"
             className="absolute inset-0 bg-slate-950/45"
             onClick={onMobileClose}
             aria-label="Close sidebar overlay"
           />
-          <aside className="app-surface relative flex h-full w-72 max-w-[86vw] flex-col border-r shadow-2xl">
+          <aside className={`app-surface relative flex h-full w-72 max-w-[86vw] flex-col border-r shadow-2xl transition-all duration-200 ease-[var(--motion-ease)] ${visible ? "translate-x-0 opacity-100" : "-translate-x-2 opacity-0"}`}>
             <button
               type="button"
               onClick={onMobileClose}
