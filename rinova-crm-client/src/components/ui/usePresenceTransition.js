@@ -1,24 +1,30 @@
 import { useEffect, useState } from "react";
 
 export function usePresenceTransition(open, duration = 220) {
-  const [shouldRender, setShouldRender] = useState(open);
+  const [exiting, setExiting] = useState(false);
   const [visible, setVisible] = useState(open);
 
   useEffect(() => {
     let timeoutId;
+    let frameId;
 
     if (open) {
-      setShouldRender(true);
-      requestAnimationFrame(() => setVisible(true));
+      frameId = requestAnimationFrame(() => {
+        setVisible(true);
+      });
     } else {
-      setVisible(false);
-      timeoutId = window.setTimeout(() => setShouldRender(false), duration);
+      frameId = requestAnimationFrame(() => {
+        setVisible(false);
+        setExiting(true);
+        timeoutId = window.setTimeout(() => setExiting(false), duration);
+      });
     }
 
     return () => {
+      if (frameId) window.cancelAnimationFrame(frameId);
       if (timeoutId) window.clearTimeout(timeoutId);
     };
   }, [duration, open]);
 
-  return { shouldRender, visible };
+  return { shouldRender: open || exiting, visible };
 }

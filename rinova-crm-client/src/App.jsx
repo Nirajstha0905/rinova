@@ -21,7 +21,7 @@ function App() {
 
   return (
     <>
-      <div key={location.pathname} className="app-page-enter">
+      <div key={location.pathname} className="app-fade-enter">
         <Routes location={location}>
           <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
           <Route path="/*" element={isAuthenticated ? <AppRoutes /> : <Navigate to="/login" replace />} />

@@ -60,7 +60,7 @@ export default function CreateStudentDrawer({ open, onClose, onSuccess }) {
   if (!shouldRender) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm transition-opacity duration-200 ease-[var(--motion-ease)] ${visible ? "opacity-100" : "opacity-0"}`}>
+    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-md transition-opacity duration-200 ease-[var(--motion-ease)] ${visible ? "opacity-100" : "opacity-0"}`}>
       <form
         onSubmit={handleSubmit}
         className={`w-full max-w-2xl overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_24px_70px_rgba(15,23,42,0.24)] dark:shadow-none transition-all duration-200 ease-[var(--motion-ease)] ${visible ? "translate-y-0 scale-100 opacity-100" : "translate-y-2 scale-[0.985] opacity-0"}`}

@@ -557,7 +557,7 @@ export default function EditStudentDrawer({
       {/* BACKDROP */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
+        className={`fixed inset-0 bg-black/50 backdrop-blur-md z-40 transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
           ${animate ? "opacity-100" : "opacity-0"}`}
       />
 

@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import * as documentApi from "../../api/documentApi";
 import * as studentApi from "../../api/studentApi";
+import { usePresenceTransition } from "../../components/ui/usePresenceTransition";
 
 const DOCUMENT_TYPES = [
   "passport",
@@ -183,6 +184,7 @@ function EmptyState({ title, description }) {
 }
 
 function UploadDrawer({ open, students, onClose, onSuccess }) {
+  const { shouldRender, visible } = usePresenceTransition(open);
   const [studentId, setStudentId] = useState("");
   const [docType, setDocType] = useState(DOCUMENT_TYPES[0]);
   const [file, setFile] = useState(null);
@@ -234,11 +236,11 @@ function UploadDrawer({ open, students, onClose, onSuccess }) {
     }
   };
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/35 backdrop-blur-sm">
-      <div className="h-full w-full max-w-lg overflow-y-auto bg-(--color-surface) shadow-2xl">
+    <div className={`fixed inset-0 z-50 flex justify-end bg-slate-950/35 backdrop-blur-md transition-opacity duration-200 ease-[var(--motion-ease)] ${visible ? "opacity-100" : "opacity-0"}`}>
+      <div className={`h-full w-full max-w-lg overflow-y-auto bg-(--color-surface) shadow-2xl transition-all duration-200 ease-[var(--motion-ease)] ${visible ? "translate-x-0 opacity-100" : "translate-x-2 opacity-0"}`}>
         <div className="sticky top-0 z-10 border-b border-(--color-border) bg-(--color-surface) px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -894,8 +896,8 @@ export default function DocumentPage() {
         onSuccess={loadPageData}
       />
       {previewUrl && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-6">
-          <div className="relative h-[90vh] w-[95vw] overflow-hidden rounded-3xl bg-(--color-surface)">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-md p-6 transition-opacity duration-200 ease-[var(--motion-ease)] app-fade-enter">
+          <div className="relative h-[90vh] w-[95vw] overflow-hidden rounded-3xl bg-(--color-surface) app-overlay-enter">
             <button
               onClick={() => setPreviewUrl(null)}
               className="absolute right-4 top-4 z-10 rounded-xl bg-(--color-surface) p-2 shadow-lg"

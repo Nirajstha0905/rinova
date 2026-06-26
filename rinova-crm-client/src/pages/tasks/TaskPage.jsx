@@ -26,6 +26,7 @@ import { EmptyState } from "../../components/ui/EmptyState";
 import { Input, Select } from "../../components/ui/Input";
 import { SelectDropdown } from "../../components/ui/SelectDropdown";
 import { PageHeader } from "../../components/ui/PageHeader";
+import { usePresenceTransition } from "../../components/ui/usePresenceTransition";
 
 const columns = [
   { key: "todo", label: "To Do", tone: "slate", icon: Circle },
@@ -232,6 +233,7 @@ function TaskCard({
 }
 
 function CreateTaskModal({ open, onClose, onCreate, users, students, leads }) {
+  const { shouldRender, visible } = usePresenceTransition(open);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("normal");
@@ -280,13 +282,13 @@ function CreateTaskModal({ open, onClose, onCreate, users, students, leads }) {
     handleClose();
   };
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-md transition-opacity duration-200 ease-[var(--motion-ease)] ${visible ? "opacity-100" : "opacity-0"}`}>
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-2xl overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) shadow-[0_24px_70px_rgba(15,23,42,0.24)] dark:shadow-none"
+        className={`w-full max-w-2xl overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) shadow-[0_24px_70px_rgba(15,23,42,0.24)] dark:shadow-none transition-all duration-200 ease-[var(--motion-ease)] ${visible ? "translate-y-0 scale-100 opacity-100" : "translate-y-2 scale-[0.985] opacity-0"}`}
       >
         <div className="border-b border-(--color-border) px-5 py-4 sm:px-6">
           <h2 className="text-xl font-bold text-(--color-text)">Create Task</h2>
@@ -746,7 +748,4 @@ export default function TaskPage() {
     </div>
   );
 }
-
-
-
 
