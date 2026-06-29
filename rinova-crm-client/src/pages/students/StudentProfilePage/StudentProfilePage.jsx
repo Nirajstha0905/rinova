@@ -20,17 +20,19 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
-import * as studentApi from "../../api/studentApi";
-import * as documentApi from "../../api/documentApi";
-import * as academicApi from "../../api/academicRecordApi";
-import * as workExperienceApi from "../../api/workExperienceApi";
-import * as userApi from "../../api/userApi";
-import { useAuth } from "../../context/AuthContext";
-import { Button } from "../../components/ui/Button";
-import { Card, CardContent } from "../../components/ui/Card";
-import { Input, Select } from "../../components/ui/Input";
-import { SelectDropdown } from "../../components/ui/SelectDropdown";
-import { usePresenceTransition } from "../../components/ui/usePresenceTransition";
+import ProfileHero from "./ProfileHero";
+import ProfileTabs from "./ProfileTabs";
+import * as studentApi from "../../../api/studentApi";
+import * as documentApi from "../../../api/documentApi";
+import * as academicApi from "../../../api/academicRecordApi";
+import * as workExperienceApi from "../../../api/workExperienceApi";
+import * as userApi from "../../../api/userApi";
+import { useAuth } from "../../../context/AuthContext";
+import { Button } from "../../../components/ui/Button";
+import { Card, CardContent } from "../../../components/ui/Card";
+import { Input, Select } from "../../../components/ui/Input";
+import { SelectDropdown } from "../../../components/ui/SelectDropdown";
+import { usePresenceTransition } from "../../../components/ui/usePresenceTransition";
 
 const localStorageKey = (id, suffix) => `student-profile-${id}-${suffix}`;
 
@@ -130,11 +132,11 @@ const describeAcademicRecord = (record) => {
     return [
       record?.schoolName || record?.institutionName || "School not set",
       record?.completionYear ? `Completed ${record.completionYear}` : null,
-      record?.gpaPercentage ? `GPA / % ${record.gpaPercentage}` : null,
-      record?.divisionGrade ? `Grade ${record.divisionGrade}` : null,
+      record?.gpaPercentage ? `GPA : ${record.gpaPercentage} ` : null,
+      record?.divisionGrade ? `Grade:  ${record.divisionGrade} %` : null,
     ]
       .filter(Boolean)
-      .join(" â€¢ ");
+      .join("• ");
   }
 
   if (level === "+2 or Equivalent") {
@@ -147,7 +149,7 @@ const describeAcademicRecord = (record) => {
       record?.majorSubjects || null,
     ]
       .filter(Boolean)
-      .join(" â€¢ ");
+      .join("• ");
   }
 
   return [
@@ -158,7 +160,7 @@ const describeAcademicRecord = (record) => {
     record?.thesisTitle || null,
   ]
     .filter(Boolean)
-    .join(" â€¢ ");
+    .join("• ");
 };
 
 const describeWorkExperience = (record) =>
@@ -174,7 +176,7 @@ const describeWorkExperience = (record) =>
         : null,
   ]
     .filter(Boolean)
-    .join(" â€¢ ");
+    .join("• ");
 
 function SectionHeading({ title, description, action }) {
   return (
@@ -1640,7 +1642,13 @@ export default function StudentProfilePage() {
         <ArrowLeft size={15} />
         Back to students
       </button>
-
+      <ProfileHero
+        student={student}
+        applications={profile}
+        documents={documents}
+        getInitials={getInitials}
+        onEdit={() => openPersonalEditor(true)}
+      />
       <Card className="overflow-hidden">
         <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="border-b border-(--color-border) p-5 lg:border-b-0 lg:border-r">
@@ -1744,7 +1752,7 @@ export default function StudentProfilePage() {
           </div>
         </div>
       </Card>
-
+      <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="sticky top-0 z-10 -mx-1 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 px-1 backdrop-blur sm:mx-0 sm:px-0">
         <div className="flex gap-2 overflow-x-auto py-2">
           {[
