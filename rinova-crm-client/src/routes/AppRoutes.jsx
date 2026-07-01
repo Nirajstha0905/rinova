@@ -3,7 +3,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import DashboardPage from "../pages/dashboard/DashboardPage";
 import LeadPage from "../pages/leads/LeadPage";
 import StudentPage from "../pages/students/StudentPage";
-import StudentProfilePage from "../pages/students/StudentProfilePage";
+import StudentProfilePage from "../pages/students/StudentProfilePage/StudentProfilePage";
 import ApplicationPage from "../pages/applications/ApplicationPage";
 import DocumentPage from "../pages/documents/DocumentPage";
 import TaskPage from "../pages/tasks/TaskPage";

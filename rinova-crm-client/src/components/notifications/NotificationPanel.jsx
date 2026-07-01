@@ -7,6 +7,7 @@ import { Button } from "../ui/Button";
 import { EmptyState } from "../ui/EmptyState";
 import NotificationItem from "./NotificationItem";
 import { groupNotifications } from "./notificationUtils";
+import { usePresenceTransition } from "../ui/usePresenceTransition";
 
 export default function NotificationPanel({
   open,
@@ -17,6 +18,7 @@ export default function NotificationPanel({
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("all");
+  const { shouldRender, visible } = usePresenceTransition(open);
 
   const unreadCount = notifications.filter((item) => !item.isRead).length;
 
@@ -81,10 +83,10 @@ export default function NotificationPanel({
     }
   };
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className={`fixed inset-0 z-50 transition-opacity duration-200 ease-[var(--motion-ease)] ${visible ? "opacity-100" : "opacity-0"}`}>
       <button
         type="button"
         onClick={onClose}
@@ -92,7 +94,7 @@ export default function NotificationPanel({
         aria-label="Close notification panel"
       />
 
-      <aside className="absolute right-3 top-20 flex max-h-[calc(100vh-6rem)] w-[calc(100vw-1.5rem)] max-w-md flex-col overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_24px_70px_rgba(15,23,42,0.22)] dark:shadow-none sm:right-6">
+      <aside className={`absolute right-3 top-20 flex max-h-[calc(100vh-6rem)] w-[calc(100vw-1.5rem)] max-w-md flex-col overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_24px_70px_rgba(15,23,42,0.22)] dark:shadow-none sm:right-6 transition-all duration-200 ease-[var(--motion-ease)] ${visible ? "translate-x-0 scale-100 opacity-100" : "translate-x-2 scale-[0.985] opacity-0"}`}>
         <div className="border-b border-[var(--color-border)] p-5">
           <div className="flex items-start justify-between gap-4">
             <div>

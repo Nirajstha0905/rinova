@@ -23,6 +23,7 @@ const normalizeStudent = (student) => ({
   email: asText(student?.email),
   phone: asText(student?.phone),
   dob: student?.date_of_birth ?? null,
+  address: asText(student?.address),
   preferredCourse: asText(student?.preferred_course),
   preferredCountry: asText(student?.preferred_country),
   nationality: asText(student?.nationality),

@@ -6,6 +6,7 @@ import * as notificationApi from "../../api/notificationApi";
 import { useAuth } from "../../context/AuthContext";
 import ThemeToggle from "../theme/ThemeToggle";
 import NotificationPanel from "../notifications/NotificationPanel";
+import { usePresenceTransition } from "../ui/usePresenceTransition";
 
 const getRoleColor = (role) => {
   const colors = {
@@ -33,6 +34,7 @@ export default function Navbar({ onMenuClick }) {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { shouldRender, visible } = usePresenceTransition(showDropdown);
 
   const displayName = user?.full_name || user?.email || "User";
   const displayRole = userRole || "Staff";
@@ -128,8 +130,8 @@ export default function Navbar({ onMenuClick }) {
             </div>
           </button>
 
-          {showDropdown && (
-            <div className="app-surface absolute right-0 z-50 mt-2 min-w-48 rounded-xl border p-2 shadow-lg">
+          {shouldRender && (
+            <div className={`app-surface absolute right-0 z-50 mt-2 min-w-48 rounded-xl border p-2 shadow-lg transition-all duration-200 ease-[var(--motion-ease)] ${visible ? "translate-y-0 scale-100 opacity-100" : "translate-y-1 scale-[0.985] opacity-0"}`}>
               <div className="mb-1 border-b border-(--color-border) px-3 py-2">
                 <p className="truncate text-sm font-semibold text-(--color-text)">
                   {displayName}

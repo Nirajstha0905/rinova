@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import {
   CalendarClock,
@@ -24,7 +24,9 @@ import { Button } from "../../components/ui/Button";
 import { Card, CardContent, CardHeader } from "../../components/ui/Card";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { Input, Select } from "../../components/ui/Input";
+import { SelectDropdown } from "../../components/ui/SelectDropdown";
 import { PageHeader } from "../../components/ui/PageHeader";
+import { usePresenceTransition } from "../../components/ui/usePresenceTransition";
 
 const columns = [
   { key: "todo", label: "To Do", tone: "slate", icon: Circle },
@@ -58,166 +60,6 @@ const taskCategories = [
   "admin",
   "lead",
 ];
-
-const statusTone = {
-  todo: "slate",
-  in_progress: "blue",
-  review: "violet",
-  completed: "green",
-  done: "green",
-};
-
-const SelectDropdown = ({
-  label,
-  value,
-  onChange,
-  options,
-  placeholder,
-  error,
-  renderOption,
-  renderSelected,
-  direction = "down",
-}) => {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const containerRef = useRef(null);
-  const inputRef = useRef(null);
-
-  const filtered = options.filter((o) =>
-    (o.label ?? o).toLowerCase().includes(query.toLowerCase()),
-  );
-
-  // close on outside click
-  useEffect(() => {
-    const handler = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpen(false);
-        setQuery("");
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  // focus search input when opened
-  useEffect(() => {
-    if (open) inputRef.current?.focus();
-  }, [open]);
-
-  const handleSelect = (opt) => {
-    onChange(opt.value ?? opt);
-    setOpen(false);
-    setQuery("");
-  };
-
-  const displayValue = value
-    ? renderSelected
-      ? renderSelected(options.find((o) => (o.value ?? o) === value))
-      : (options.find((o) => (o.value ?? o) === value)?.label ?? value)
-    : null;
-
-  return (
-    <div className="relative space-y-1" ref={containerRef}>
-      {label && (
-        <label className="text-sm font-medium text-(--color-text)">
-          {label}
-        </label>
-      )}
-
-      {/* trigger */}
-      <button
-        type="button"
-        onClick={() => setOpen((p) => !p)}
-        className={`
-          w-full rounded-xl border bg-(--color-surface) px-4 py-2.5 text-left
-          text-(--color-text) shadow-sm outline-none transition flex items-center justify-between
-          hover:border-(--color-border)
-          ${open ? "border-indigo-500 ring-4 ring-indigo-100" : "border-(--color-border)"}
-          ${error ? "border-red-400" : ""}
-        `}
-      >
-        <span
-          className={
-            displayValue ? "text-(--color-text)" : "text-(--color-muted)"
-          }
-        >
-          {displayValue ?? placeholder ?? "Select…"}
-        </span>
-        <svg
-          className={`w-4 h-4 text-(--color-muted) transition-transform ${open ? "rotate-180" : ""}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
-
-      {/* dropdown panel */}
-      {open && (
-        <div
-          className={`absolute z-9999 w-full rounded-xl border border-(--color-border) bg-(--color-surface) shadow-xl overflow-hidden ${
-            direction === "up" ? "bottom-full mb-1" : "top-full mt-1"
-          }`}
-        >
-          {/* options list */}
-          <ul className="max-h-52 overflow-y-auto py-1">
-            {filtered.length === 0 ? (
-              <li className="px-4 py-2 text-sm text-(--color-muted)">
-                No results
-              </li>
-            ) : (
-              filtered.map((opt) => {
-                const val = opt.value ?? opt;
-                const isSelected = val === value;
-                return (
-                  <li
-                    key={val}
-                    onMouseDown={() => handleSelect(opt)}
-                    className={`
-                      flex items-center gap-2 px-4 py-2 text-sm cursor-pointer transition
-                      ${
-                        isSelected
-                          ? "bg-indigo-50 text-indigo-700 font-medium"
-                          : "text-(--color-text) hover:bg-(--color-surface-muted)"
-                      }
-                    `}
-                  >
-                    {renderOption ? renderOption(opt) : (opt.label ?? opt)}
-                    {isSelected && (
-                      <svg
-                        className="ml-auto w-3.5 h-3.5 text-indigo-500 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={3}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    )}
-                  </li>
-                );
-              })
-            )}
-          </ul>
-        </div>
-      )}
-
-      {error && (
-        <p className="text-xs text-red-500 font-medium">{error.message}</p>
-      )}
-    </div>
-  );
-};
 
 const formatLabel = (value = "") =>
   value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -391,6 +233,7 @@ function TaskCard({
 }
 
 function CreateTaskModal({ open, onClose, onCreate, users, students, leads }) {
+  const { shouldRender, visible } = usePresenceTransition(open);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("normal");
@@ -439,13 +282,13 @@ function CreateTaskModal({ open, onClose, onCreate, users, students, leads }) {
     handleClose();
   };
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-md transition-opacity duration-200 ease-[var(--motion-ease)] ${visible ? "opacity-100" : "opacity-0"}`}>
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-2xl overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) shadow-[0_24px_70px_rgba(15,23,42,0.24)] dark:shadow-none"
+        className={`w-full max-w-2xl overflow-hidden rounded-3xl border border-(--color-border) bg-(--color-surface) shadow-[0_24px_70px_rgba(15,23,42,0.24)] dark:shadow-none transition-all duration-200 ease-[var(--motion-ease)] ${visible ? "translate-y-0 scale-100 opacity-100" : "translate-y-2 scale-[0.985] opacity-0"}`}
       >
         <div className="border-b border-(--color-border) px-5 py-4 sm:px-6">
           <h2 className="text-xl font-bold text-(--color-text)">Create Task</h2>
@@ -694,8 +537,6 @@ export default function TaskPage() {
   };
 
   const handleStatusChange = async (id, nextStatus) => {
-    const previousTasks = [...tasks];
-
     setTasks((prev) =>
       prev.map((task) =>
         task.id === id ? { ...task, status: nextStatus } : task,
@@ -907,3 +748,4 @@ export default function TaskPage() {
     </div>
   );
 }
+

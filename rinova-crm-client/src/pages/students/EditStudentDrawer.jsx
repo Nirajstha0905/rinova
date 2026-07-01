@@ -1,14 +1,15 @@
-import { useForm, Controller } from "react-hook-form";
+﻿import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { studentSchema } from "./student.schema";
 import { mapStudentToApi } from "./student.mapper";
 import { updateStudent } from "../../api/studentApi";
+import { SelectDropdown } from "../../components/ui/SelectDropdown";
 import toast from "react-hot-toast";
 import { useState, useEffect, useRef } from "react";
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // STATIC DATA
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const GENDERS = [
   { value: "male", label: "Male" },
   { value: "female", label: "Female" },
@@ -249,177 +250,9 @@ const flag = (code) =>
     .map((c) => String.fromCodePoint(127397 + c.charCodeAt(0)))
     .join("");
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // REUSABLE SELECT DROPDOWN (searchable)
-// ─────────────────────────────────────────────
-const SelectDropdown = ({
-  label,
-  value,
-  onChange,
-  options,
-  placeholder,
-  error,
-  renderOption,
-  renderSelected,
-}) => {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const containerRef = useRef(null);
-  const inputRef = useRef(null);
-
-  const filtered = options.filter((o) =>
-    (o.label ?? o).toLowerCase().includes(query.toLowerCase()),
-  );
-
-  // close on outside click
-  useEffect(() => {
-    const handler = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpen(false);
-        setQuery("");
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  // focus search input when opened
-  useEffect(() => {
-    if (open) inputRef.current?.focus();
-  }, [open]);
-
-  const handleSelect = (opt) => {
-    onChange(opt.value ?? opt);
-    setOpen(false);
-    setQuery("");
-  };
-
-  const displayValue = value
-    ? renderSelected
-      ? renderSelected(options.find((o) => (o.value ?? o) === value))
-      : (options.find((o) => (o.value ?? o) === value)?.label ?? value)
-    : null;
-
-  return (
-    <div className="relative space-y-1" ref={containerRef}>
-      {label && (
-        <label className="text-sm font-medium text-(--color-text)">{label}</label>
-      )}
-
-      {/* trigger */}
-      <button
-        type="button"
-        onClick={() => setOpen((p) => !p)}
-        className={`
-          w-full rounded-xl border bg-(--color-surface) px-4 py-2.5 text-left
-          text-(--color-text) shadow-sm outline-none transition flex items-center justify-between
-          hover:border-(--color-border)
-          ${open ? "border-indigo-500 ring-4 ring-indigo-100" : "border-(--color-border)"}
-          ${error ? "border-red-400" : ""}
-        `}
-      >
-        <span className={displayValue ? "text-(--color-text)" : "text-(--color-muted)"}>
-          {displayValue ?? placeholder ?? "Select…"}
-        </span>
-        <svg
-          className={`w-4 h-4 text-(--color-muted) transition-transform ${open ? "rotate-180" : ""}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-      </button>
-
-      {/* dropdown panel */}
-      {open && (
-        <div className="absolute z-9999 top-full mt-1 w-full rounded-xl border border-(--color-border) bg-(--color-surface) shadow-xl overflow-hidden">
-          {/* search */}
-          <div className="px-3 py-2 border-b border-(--color-border)">
-            <div className="flex items-center gap-2 bg-(--color-surface-muted) rounded-lg px-3 py-1.5">
-              <svg
-                className="w-3.5 h-3.5 text-(--color-muted) shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
-                />
-              </svg>
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search…"
-                className="flex-1 bg-transparent text-sm text-(--color-text) outline-none placeholder:text-(--color-muted)"
-              />
-            </div>
-          </div>
-
-          {/* options list */}
-          <ul className="max-h-52 overflow-y-auto py-1">
-            {filtered.length === 0 ? (
-              <li className="px-4 py-2 text-sm text-(--color-muted)">No results</li>
-            ) : (
-              filtered.map((opt) => {
-                const val = opt.value ?? opt;
-                const isSelected = val === value;
-                return (
-                  <li
-                    key={val}
-                    onMouseDown={() => handleSelect(opt)}
-                    className={`
-                      flex items-center gap-2 px-4 py-2 text-sm cursor-pointer transition
-                      ${
-                        isSelected
-                          ? "bg-indigo-50 text-indigo-700 font-medium"
-                          : "text-(--color-text) hover:bg-(--color-surface-muted)"
-                      }
-                    `}
-                  >
-                    {renderOption ? renderOption(opt) : (opt.label ?? opt)}
-                    {isSelected && (
-                      <svg
-                        className="ml-auto w-3.5 h-3.5 text-indigo-500 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={3}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    )}
-                  </li>
-                );
-              })
-            )}
-          </ul>
-        </div>
-      )}
-
-      {error && (
-        <p className="text-xs text-red-500 font-medium">{error.message}</p>
-      )}
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────
-// PHONE FIELD WITH COUNTRY CODE PREFIX
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -469,7 +302,7 @@ const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
           className="flex items-center gap-1.5 px-3 py-2.5 border-r border-(--color-border) bg-(--color-surface-muted) hover:bg-(--color-surface-muted) transition shrink-0"
         >
           <span className="text-base leading-none">
-            {selected ? flag(selected.code) : "🌐"}
+            {selected ? flag(selected.code) : "ðŸŒ"}
           </span>
           <span className="text-sm font-medium text-(--color-text)">
             {dialValue || "+1"}
@@ -520,7 +353,7 @@ const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Country or code…"
+                placeholder="Country or codeâ€¦"
                 className="flex-1 bg-transparent text-sm text-(--color-text) outline-none placeholder:text-(--color-muted)"
               />
             </div>
@@ -572,9 +405,9 @@ const PhoneField = ({ dialValue, dialOnChange, phoneReg, error }) => {
   );
 };
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // SHARED INPUT & SECTION
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const Input = ({ label, error, ...props }) => (
   <div className="space-y-1">
     {label && (
@@ -620,9 +453,9 @@ const Section = ({ title, children }) => (
   </div>
 );
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // MAIN DRAWER
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const FORM_DEFAULT_VALUES = {
   first_name: "",
   middle_name: "",
@@ -724,7 +557,7 @@ export default function EditStudentDrawer({
       {/* BACKDROP */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
+        className={`fixed inset-0 bg-black/50 backdrop-blur-md z-40 transition-opacity duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
           ${animate ? "opacity-100" : "opacity-0"}`}
       />
 
@@ -749,7 +582,7 @@ export default function EditStudentDrawer({
             onClick={onClose}
             className="h-10 w-10 rounded-xl flex items-center justify-center hover:bg-(--color-surface-muted) text-(--color-muted) text-lg"
           >
-            ✕
+            âœ•
           </button>
         </div>
 
@@ -980,3 +813,4 @@ export default function EditStudentDrawer({
     </>
   );
 }
+

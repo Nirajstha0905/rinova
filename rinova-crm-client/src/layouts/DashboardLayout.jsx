@@ -16,7 +16,7 @@ export default function DashboardLayout() {
       <div className="flex min-w-0 flex-1 flex-col md:ml-64">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 overflow-auto px-4 py-4 sm:px-5 md:px-8 md:py-7">
+        <main className="relative flex-1 overflow-auto px-4 py-4 sm:px-5 md:px-8 md:py-7">
           <Outlet />
         </main>
       </div>
