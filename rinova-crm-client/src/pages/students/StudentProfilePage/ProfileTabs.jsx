@@ -1,58 +1,74 @@
-import {
-  LayoutDashboard,
-  FileText,
-  FolderOpen,
-  ClipboardList,
-  Clock3,
-} from "lucide-react";
+import { User, FileText, Building2, Activity } from "lucide-react";
 
 const tabs = [
   {
-    id: "overview",
-    label: "Overview",
-    icon: LayoutDashboard,
+    key: "personal",
+    icon: User,
+    label: "Personal Information",
+    iconBg: "bg-blue-100",
+    iconColor: "text-blue-600",
   },
   {
-    id: "applications",
-    label: "Applications",
+    key: "documents",
     icon: FileText,
-  },
-  {
-    id: "documents",
     label: "Documents",
-    icon: FolderOpen,
+    iconBg: "bg-amber-100",
+    iconColor: "text-amber-600",
   },
   {
-    id: "notes",
-    label: "Notes & Activity",
-    icon: ClipboardList,
+    key: "academic",
+    icon: Building2,
+    label: "Academic",
+    iconBg: "bg-emerald-100",
+    iconColor: "text-emerald-600",
   },
   {
-    id: "timeline",
+    key: "timeline",
+    icon: Activity,
     label: "Timeline",
-    icon: Clock3,
+    iconBg: "bg-violet-100",
+    iconColor: "text-violet-600",
   },
 ];
 
 export default function ProfileTabs({ activeTab, setActiveTab }) {
   return (
-    <div className="mt-8">
-      <div className="inline-flex flex-wrap gap-2 rounded-2xl border border-(--color-border) bg-(--color-surface) p-2 shadow-sm">
+    <div className="sticky top-0 z-10 rounded-2xl border border-[var(--color-border)] bg-gray-50 p-2 backdrop-blur">
+      <div className="flex gap-2 overflow-x-auto">
         {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const active = activeTab === tab.id;
-
           return (
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col gap-3 border-b border-(--color-border) px-5 py-2 sm:flex-row sm:items-center sm:justify-between transition-all ${
-                active
-                  ? "text-lg font-bold tracking-tight text-[var(--color-primary)]"
-                  : "text-(--color-muted) hover: bg-(--color-surface-muted)"
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`group flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
+                activeTab === tab.key
+                  ? "bg-white text-(--color-primary) shadow-sm ring-1 ring-(--color-border)"
+                  : "text-(--color-muted) hover:bg-white hover:text-(--color-text) hover:shadow-sm hover:scale-[1.02]"
               }`}
             >
-              {tab.label}
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                  activeTab === tab.key
+                    ? `${tab.iconBg} shadow-sm`
+                    : "bg-gray-100 group-hover:bg-gray-200"
+                }`}
+              >
+                <tab.icon
+                  size={16}
+                  className={
+                    activeTab === tab.key ? tab.iconColor : "text-gray-500"
+                  }
+                />
+              </span>
+
+              <span
+                className={
+                  activeTab === tab.key ? tab.iconColor : "text-gray-500"
+                }
+              >
+                {tab.label}
+              </span>
             </button>
           );
         })}

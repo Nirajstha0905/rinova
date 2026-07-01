@@ -11,24 +11,49 @@ import {
   FolderOpen,
   User,
 } from "lucide-react";
-
 import { Button } from "../../../components/ui/Button";
 import { Card } from "../../../components/ui/Card";
 import StudentProfilePage from "./StudentProfilePage";
 
-const Stat = ({ icon: Icon, title, value }) => (
-  <div className="felx items-center gap-4 rounded-2xl border border-(--color-border) bg-(--color-surface-muted) p-5 transition hover:shadow-md">
-    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-(--color-primary)/10">
-      <Icon size={22} />
+const Stat = ({
+  icon: Icon,
+  title,
+  value,
+  iconColor = "text-(--color-text)",
+}) => (
+  <div className="flex items-center gap-4 rounded-2xl border border-(--color-border) bg-(--color-surface-muted) p-4 transition hover:shadow-md">
+    <div className="flex h-8 w-12 items-center justify-center rounded-xl ">
+      <Icon size={22} className={iconColor} />
     </div>
     <div>
-      <p className="text-xs uppercase tracking-wide text-(--color-muted)">
+      <p className="text-xs uppercase tracking-wide text-(--color-muted) py-2">
         {title}
       </p>
       <h3 className="text-lg font-bold text-(--color-text)">{value}</h3>
     </div>
   </div>
 );
+const STATUSES = [
+  { value: "pending", label: "Pending" },
+  { value: "active", label: "Active" },
+  { value: "enrolled", label: "Enrolled" },
+  { value: "inactive", label: "Inactive" },
+];
+const getStatusClass = (status = "") => {
+  const normalized = status.toLowerCase();
+
+  if (normalized.includes("active") || normalized.includes("enrolled")) {
+    return "bg-emerald-50 text-emerald-700 border-emerald-100";
+  }
+  if (normalized.includes("reject") || normalized.includes("inactive")) {
+    return "bg-rose-50 text-rose-700 border-rose-100";
+  }
+  if (normalized.includes("pending")) {
+    return "bg-amber-50 text-amber-700 border-amber-100";
+  }
+
+  return "bg-slate-50 text-slate-600 border-slate-200";
+};
 
 export default function ProfileHero({
   student,
@@ -63,8 +88,10 @@ export default function ProfileHero({
                 <h1 className="text-4xl font-bold text-(--color-text)">
                   {student?.name}
                 </h1>
-                <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
-                  Active
+                <span
+                  className={`rounded-full  px-3 py-1 text-sm font-semibold ${getStatusClass(student.status)}`}
+                >
+                  {student?.status}
                 </span>
               </div>
               <div className="mt-5 flex flex-wrap gap-x-8 gap-y-3 text-sm text-(--color-muted)">
@@ -93,21 +120,29 @@ export default function ProfileHero({
         {/* Stats */}
 
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          <Stat icon={Star} title="GPA" value={student?.gpa || "N/A"} />
+          <Stat
+            icon={Star}
+            title="GPA"
+            iconColor="text-orange-500"
+            value={student?.gpa || "N/A"}
+          />
           <Stat
             icon={FileText}
             title="Applications"
+            iconColor="text-blue-500"
             value={profile?.summary?.applications ?? 0}
             helper="Linked applications"
           />
           <Stat
             icon={FolderOpen}
             title="Documents"
+            iconColor="text-green-500"
             value={documents?.length || "0"}
           />
           <Stat
             icon={User}
             title="Counsellor"
+            iconColor="text-purple-500"
             value={student?.assignedCounsellor || "Not Assigned"}
           />
         </div>
