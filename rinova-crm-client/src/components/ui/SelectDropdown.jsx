@@ -2,10 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, Search } from "lucide-react";
 
 const toLabel = (option) =>
-  typeof option === "string" ? option : option?.label ?? option?.value ?? "";
+  typeof option === "string" ? option : (option?.label ?? option?.value ?? "");
 
 const toValue = (option) =>
-  typeof option === "string" ? option : option?.value ?? option?.label ?? "";
+  typeof option === "string" ? option : (option?.value ?? option?.label ?? "");
 
 export function SelectDropdown({
   label,
@@ -25,7 +25,7 @@ export function SelectDropdown({
   const [query, setQuery] = useState("");
   const containerRef = useRef(null);
   const searchRef = useRef(null);
-
+  const showSearch = options.length > 4;
   const selectedOption = useMemo(
     () => options.find((option) => toValue(option) === value),
     [options, value],
@@ -35,12 +35,17 @@ export function SelectDropdown({
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return options;
 
-    return options.filter((option) => toLabel(option).toLowerCase().includes(trimmed));
+    return options.filter((option) =>
+      toLabel(option).toLowerCase().includes(trimmed),
+    );
   }, [options, query]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
         setOpen(false);
         setQuery("");
       }
@@ -51,10 +56,10 @@ export function SelectDropdown({
   }, []);
 
   useEffect(() => {
-    if (open) {
+    if (open && showSearch) {
       searchRef.current?.focus();
     }
-  }, [open]);
+  }, [open, showSearch]);
 
   const handleSelect = (option) => {
     onChange?.(toValue(option));
@@ -71,7 +76,9 @@ export function SelectDropdown({
   return (
     <div className="relative space-y-1" ref={containerRef}>
       {label ? (
-        <label className="text-sm font-medium text-(--color-text)">{label}</label>
+        <label className="text-sm font-medium text-(--color-text)">
+          {label}
+        </label>
       ) : null}
 
       <button
@@ -82,11 +89,17 @@ export function SelectDropdown({
           "flex w-full items-center justify-between gap-3 rounded-xl border bg-(--color-surface) px-4 py-2.5 text-left text-sm text-(--color-text) shadow-sm outline-none transition",
           "hover:border-(--color-border)",
           disabled ? "cursor-not-allowed opacity-60" : "",
-          open ? "border-[var(--color-primary)] ring-4 ring-[var(--color-primary)]/10" : "border-(--color-border)",
+          open
+            ? "border-[var(--color-primary)] ring-4 ring-[var(--color-primary)]/10"
+            : "border-(--color-border)",
           error ? "border-red-400 ring-0" : "",
         ].join(" ")}
       >
-        <span className={displayValue ? "text-(--color-text)" : "text-(--color-muted)"}>
+        <span
+          className={
+            displayValue ? "text-(--color-text)" : "text-(--color-muted)"
+          }
+        >
           {displayValue || placeholder}
         </span>
         <ChevronDown
@@ -101,19 +114,20 @@ export function SelectDropdown({
             direction === "up" ? "bottom-full mb-1" : "top-full mt-1"
           }`}
         >
-          <div className="border-b border-(--color-border) px-3 py-2">
-            <div className="flex items-center gap-2 rounded-lg bg-(--color-surface-muted) px-3 py-2">
-              <Search size={14} className="shrink-0 text-(--color-muted)" />
-              <input
-                ref={searchRef}
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={searchPlaceholder}
-                className="w-full bg-transparent text-sm text-(--color-text) outline-none placeholder:text-(--color-muted)"
-              />
+          {showSearch && (
+            <div className="border-b border-(--color-border) px-3 py-2">
+              <div className="flex items-center gap-2 rounded-lg bg-(--color-surface-muted) px-3 py-2">
+                <Search size={14} className="shrink-0 text-(--color-muted)" />
+                <input
+                  ref={searchRef}
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={searchPlaceholder}
+                  className="w-full bg-transparent text-sm text-(--color-text) outline-none placeholder:text-(--color-muted)"
+                />
+              </div>
             </div>
-          </div>
-
+          )}
           <ul className="max-h-56 overflow-y-auto py-1">
             {filteredOptions.length ? (
               filteredOptions.map((option) => {
@@ -134,18 +148,24 @@ export function SelectDropdown({
                     <span className="min-w-0 flex-1 truncate">
                       {renderOption ? renderOption(option) : toLabel(option)}
                     </span>
-                    {isSelected ? <Check size={14} className="shrink-0" /> : null}
+                    {isSelected ? (
+                      <Check size={14} className="shrink-0" />
+                    ) : null}
                   </li>
                 );
               })
             ) : (
-              <li className="px-4 py-3 text-sm text-(--color-muted)">{emptyText}</li>
+              <li className="px-4 py-3 text-sm text-(--color-muted)">
+                {emptyText}
+              </li>
             )}
           </ul>
         </div>
       ) : null}
 
-      {error ? <p className="text-xs font-medium text-red-500">{error.message}</p> : null}
+      {error ? (
+        <p className="text-xs font-medium text-red-500">{error.message}</p>
+      ) : null}
     </div>
   );
 }
