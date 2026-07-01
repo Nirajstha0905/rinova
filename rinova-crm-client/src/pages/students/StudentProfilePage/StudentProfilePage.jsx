@@ -1,8 +1,15 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 import {
   ArrowLeft,
+  Activity,
+  Hash,
+  BookUser,
+  Building2,
+  Calendar,
+  ClipboardList,
   CalendarDays,
   CheckCircle2,
   Clock3,
@@ -18,6 +25,8 @@ import {
   Phone,
   Plus,
   ShieldCheck,
+  ShieldAlert,
+  User,
   X,
 } from "lucide-react";
 import ProfileHero from "./ProfileHero";
@@ -33,6 +42,7 @@ import { Card, CardContent } from "../../../components/ui/Card";
 import { Input, Select } from "../../../components/ui/Input";
 import { SelectDropdown } from "../../../components/ui/SelectDropdown";
 import { usePresenceTransition } from "../../../components/ui/usePresenceTransition";
+import TimelineTab from "./TimelineTab";
 
 const localStorageKey = (id, suffix) => `student-profile-${id}-${suffix}`;
 
@@ -80,7 +90,12 @@ const ACADEMIC_LEVELS = [
   "+2 or Equivalent",
   "Bachelor's Degree",
 ];
-
+const STATUSES = [
+  { value: "pending", label: "Pending" },
+  { value: "active", label: "Active" },
+  { value: "enrolled", label: "Enrolled" },
+  { value: "inactive", label: "Inactive" },
+];
 const ACADEMIC_FIELD_SETS = {
   "SEE or Equivalent": [
     { key: "school_name", label: "School Name" },
@@ -1242,6 +1257,7 @@ export default function StudentProfilePage() {
       email: student?.email || "",
       phone: student?.phone || "",
       remark: "",
+      status: student?.status || "",
     });
     setEditor({ section: "personal" });
   };
@@ -1375,6 +1391,7 @@ export default function StudentProfilePage() {
           last_name: draft.last_name?.trim() || null,
           email: draft.email?.trim() || null,
           phone: draft.phone?.trim() || null,
+          status: draft.status || null,
         });
 
         toast.success("Personal information updated");
@@ -1649,7 +1666,7 @@ export default function StudentProfilePage() {
         getInitials={getInitials}
         onEdit={() => openPersonalEditor(true)}
       />
-      <Card className="overflow-hidden">
+      {/* <Card className="overflow-hidden">
         <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="border-b border-(--color-border) p-5 lg:border-b-0 lg:border-r">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -1751,30 +1768,8 @@ export default function StudentProfilePage() {
             </div>
           </div>
         </div>
-      </Card>
+      </Card> */}
       <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="sticky top-0 z-10 -mx-1 border-b border-[var(--color-border)] bg-[var(--color-surface)]/95 px-1 backdrop-blur sm:mx-0 sm:px-0">
-        <div className="flex gap-2 overflow-x-auto py-2">
-          {[
-            { key: "personal", label: "Personal information" },
-            { key: "documents", label: "Documents" },
-            { key: "academic", label: "Academic" },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                activeTab === tab.key
-                  ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
-                  : "border-transparent text-[var(--color-muted)] hover:border-[var(--color-border)] hover:text-[var(--color-text)]"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-6">
@@ -2222,11 +2217,20 @@ export default function StudentProfilePage() {
             />
             <CardContent>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <Field label="Date of birth" value={formatDate(student.dob)} />
+                <Field
+                  label="Date of birth"
+                  icon={Calendar}
+                  value={formatDate(student.dob)}
+                />
                 <Field label="Gender" value={student.gender} />
-                <Field label="Passport number" value={student.passportNumber} />
+                <Field
+                  label="Passport number"
+                  icon={Hash}
+                  value={student.passportNumber}
+                />
                 <Field
                   label="Passport expiry"
+                  icon={Clock3}
                   value={formatDate(student.passportExpiry)}
                 />
                 <Field
@@ -2297,6 +2301,10 @@ export default function StudentProfilePage() {
                 </tbody>
               </table>
             </CardContent>
+          </Card>
+
+          <Card className={activeTab === "timeline" ? "" : "hidden"}>
+            <TimelineTab timeline={profile.timeline} />
           </Card>
         </div>
 
@@ -2376,6 +2384,7 @@ export default function StudentProfilePage() {
                     first_name: event.target.value,
                   }))
                 }
+                placeholder="Enter first name"
                 className="mt-2"
               />
             </label>
@@ -2391,6 +2400,7 @@ export default function StudentProfilePage() {
                     middle_name: event.target.value,
                   }))
                 }
+                placeholder="Enter middle name"
                 className="mt-2"
               />
             </label>
@@ -2406,6 +2416,7 @@ export default function StudentProfilePage() {
                     last_name: event.target.value,
                   }))
                 }
+                placeholder="Enter last name"
                 className="mt-2"
               />
             </label>
@@ -2422,10 +2433,11 @@ export default function StudentProfilePage() {
                     email: event.target.value,
                   }))
                 }
+                placeholder="Enter email address"
                 className="mt-2"
               />
             </label>
-            <label className="block sm:col-span-2">
+            <label className="block ">
               <span className="text-sm font-semibold text-[var(--color-text)]">
                 Phone
               </span>
@@ -2437,7 +2449,24 @@ export default function StudentProfilePage() {
                     phone: event.target.value,
                   }))
                 }
+                placeholder="Enter phone number"
                 className="mt-2"
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-semibold text-[var(--color-text)]">
+                Status
+              </span>
+              <SelectDropdown
+                value={student.status}
+                onChange={(value) =>
+                  setDraft((prev) => ({
+                    ...prev,
+                    status: value,
+                  }))
+                }
+                options={STATUSES}
+                placeholder="Select status"
               />
             </label>
             <label className="block sm:col-span-2">
@@ -2475,6 +2504,7 @@ export default function StudentProfilePage() {
                     date_of_birth: event.target.value,
                   }))
                 }
+                placeholder="Select date of birth"
                 className="mt-2"
               />
             </label>
@@ -2482,7 +2512,7 @@ export default function StudentProfilePage() {
               <span className="text-sm font-semibold text-[var(--color-text)]">
                 Gender
               </span>
-              <Select
+              <SelectDropdown
                 value={draft.gender || ""}
                 onChange={(event) =>
                   setDraft((current) => ({
@@ -2497,7 +2527,7 @@ export default function StudentProfilePage() {
                 <option value="female">Female</option>
                 <option value="other">Other</option>
                 <option value="prefer_not_to_say">Prefer not to say</option>
-              </Select>
+              </SelectDropdown>
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-[var(--color-text)]">
